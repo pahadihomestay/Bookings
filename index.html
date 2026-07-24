@@ -140,26 +140,46 @@
                         <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200/80 mt-6 space-y-5">
                             <h3 class="text-xs font-extrabold uppercase text-gray-400 tracking-wider">Choose Accommodation</h3>
                             
-                            <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
-                                <div>
-                                    <div class="font-bold text-dark text-sm sm:text-base">Room 101: Family Suite</div>
-                                    <div class="text-xs text-gray-500 font-medium mt-0.5">₹<span id="displayPrice101">3999</span> / night</div>
+                            <!-- Room 101: Family Suite with Photo Frame Below -->
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="font-bold text-dark text-sm sm:text-base">Room 101: Family Suite</div>
+                                        <div class="text-xs text-gray-500 font-medium mt-0.5">₹<span id="displayPrice101">3999</span> / night</div>
+                                    </div>
+                                    <div class="relative inline-block w-14 align-middle select-none">
+                                        <input type="checkbox" id="gRoom101" onchange="calculatePrice()" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer top-0.5"/>
+                                        <label for="gRoom101" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer shadow-inner"></label>
+                                    </div>
                                 </div>
-                                <div class="relative inline-block w-14 align-middle select-none">
-                                    <input type="checkbox" id="gRoom101" onchange="calculatePrice()" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer top-0.5"/>
-                                    <label for="gRoom101" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer shadow-inner"></label>
+                                <!-- Photo Frame for Family Suite -->
+                                <div class="w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-100 h-40 sm:h-48 relative">
+                                    <img src="https://i.ibb.co/99Ld3nYc/IMG-1601.jpg" alt="Family Suite Preview" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+                                    <div class="absolute bottom-2 left-2 bg-dark/70 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                        Family Suite View
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
-                                <div>
-                                    <div class="font-bold text-dark text-sm sm:text-base">Cozy Standard Rooms</div>
-                                    <div class="text-xs text-gray-500 font-medium mt-0.5">Rooms 102 to 107 (₹<span id="displayPriceStd">2999</span> / night)</div>
+                            <!-- Cozy Standard Rooms with Photo Frame Below -->
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="font-bold text-dark text-sm sm:text-base">Cozy Standard Rooms</div>
+                                        <div class="text-xs text-gray-500 font-medium mt-0.5">Rooms 102 to 107 (₹<span id="displayPriceStd">2999</span> / night)</div>
+                                    </div>
+                                    <div class="flex items-center bg-gray-50 rounded-xl border border-gray-200 overflow-hidden shadow-xs">
+                                        <button type="button" onclick="updateStdRooms(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-gray-200 text-dark transition"><i class="fa-solid fa-minus text-xs"></i></button>
+                                        <span id="stdRoomCount" class="font-bold text-base w-10 text-center text-luxury">0</span>
+                                        <button type="button" onclick="updateStdRooms(1)" class="w-10 h-10 flex items-center justify-center hover:bg-gray-200 text-dark transition"><i class="fa-solid fa-plus text-xs"></i></button>
+                                    </div>
                                 </div>
-                                <div class="flex items-center bg-gray-50 rounded-xl border border-gray-200 overflow-hidden shadow-xs">
-                                    <button type="button" onclick="updateStdRooms(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-gray-200 text-dark transition"><i class="fa-solid fa-minus text-xs"></i></button>
-                                    <span id="stdRoomCount" class="font-bold text-base w-10 text-center text-luxury">0</span>
-                                    <button type="button" onclick="updateStdRooms(1)" class="w-10 h-10 flex items-center justify-center hover:bg-gray-200 text-dark transition"><i class="fa-solid fa-plus text-xs"></i></button>
+                                <!-- Photo Frame for Standard Rooms -->
+                                <div class="w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-100 h-40 sm:h-48 relative">
+                                    <img src="https://i.ibb.co/ZRMycKTZ/IMG-1599.jpg" alt="Standard Room Preview" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+                                    <div class="absolute bottom-2 left-2 bg-dark/70 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                        Normal Room View
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -189,8 +209,7 @@
                     </div>
                     
                     <div id="dateWarningText" class="text-xs text-gray-400 text-center mb-5 font-light">
-                        
-                          Select check-in & check-out dates to calculate total price.
+                        Select check-in & check-out dates to calculate total price.
                     </div>
 
                     <button type="button" onclick="bookViaWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-base py-4 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2.5 active:scale-[0.98]">
@@ -370,7 +389,6 @@
 
     <!-- Script Engine with Firebase Realtime Sync -->
     <script>
-        // --- 1. FIREBASE CONFIGURATION (Aapke project ki details jud chuki hain) ---
         const firebaseConfig = {
             apiKey: "AIzaSyAHJLi_U9mdiotu325gCYV6",
             authDomain: "pahadi-ghar-bookig.firebaseapp.com",
@@ -391,7 +409,6 @@
         let currentCalDate = new Date();
         let currentAdminCalDate = new Date();
         
-        // --- 2. LIVE REALTIME SYNC LISTENERS ---
         function initApp() {
             db.ref('pahadi_prices').on('value', (snapshot) => {
                 let data = snapshot.val();
