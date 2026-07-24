@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pahadi Ghar - Darcha | Homestay</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: { luxury: '#d4af37', dark: '#0b0f19', carddark: '#161e2e' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .toggle-checkbox:checked { right: 0; border-color: #d4af37; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #d4af37; }
+        .toggle-checkbox { right: 1.75rem; z-index: 1; border-color: #d1d5db; transition: all 0.3s ease-in-out; }
+        .toggle-label { width: 3.5rem; height: 1.75rem; background-color: #e5e7eb; border-radius: 9999px; transition: all 0.3s ease-in-out; }
+        textarea { resize: vertical; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased overflow-x-hidden">
+
+    <!-- Premium Navbar -->
+    <nav class="bg-dark text-white sticky top-0 z-45 shadow-xl border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="showSection('public-section')">
+                <div class="w-10 h-10 rounded-full bg-luxury/10 border border-luxury/30 flex items-center justify-center text-luxury group-hover:scale-105 transition">
+                    <i class="fa-solid fa-mountain-sun text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-xl tracking-wider text-white uppercase block leading-none">Pahadi <span class="text-luxury">Ghar</span></span>
+                    <span class="text-[10px] text-gray-400 tracking-widest uppercase font-medium">Darcha • L&S</span>
+                </div>
+            </div>
+            <button type="button" onclick="toggleAdminLogin()" class="text-xs font-semibold uppercase tracking-wider hover:text-luxury transition flex items-center gap-2 bg-gray-900 border border-gray-800 px-4 py-2.5 rounded-lg shadow-sm">
+                <i class="fa-solid fa-user-lock text-luxury"></i> <span>Admin Portal</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="w-full relative">
+
+        <!-- ================= PUBLIC GUEST SECTION ================= -->
+        <section id="public-section" class="w-full fade-in pb-24">
+            <div class="w-full bg-gradient-to-b from-dark to-gray-900 py-16 px-4 text-center border-b-2 border-luxury shadow-lg">
+                <span class="text-luxury text-xs font-bold uppercase tracking-widest bg-luxury/10 px-3 py-1 rounded-full border border-luxury/20 inline-block mb-3">Welcome Experience</span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white mb-3 tracking-tight">Book Your Escape to <span class="text-luxury">Nature</span></h1>
+                <p class="text-gray-400 text-sm sm:text-base max-w-xl mx-auto font-light">Book Your Comfortable stay at The Pahadi Ghar. Darcha Dangma • Lahaul & Spiti • HP - 175132</p>
+            </div>
+
+            <div class="max-w-6xl mx-auto px-4 mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left: Booking Form -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl border border-gray-200/80 p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-5 mb-6 gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-dark">Reservation Details</h2>
+                            <p class="text-xs text-gray-500">Please provide your stay information accurately.</p>
+                        </div>
+                        <button type="button" onclick="openCalendarModal()" class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider bg-gray-900 text-white px-4 py-2.5 rounded-xl shadow hover:bg-gray-800 transition flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-calendar-days text-luxury"></i> Check Availability
+                        </button>
+                    </div>
+
+                    <form id="bookingForm" class="space-y-5" onsubmit="event.preventDefault();">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Full Name *</label>
+                                <input type="text" id="gName" placeholder="e.g. Rahul Sharma" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Phone Number *</label>
+                                <input type="tel" id="gPhone" placeholder="10-digit mobile number" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
+                                <input type="email" id="gEmail" placeholder="name@example.com" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Coming From *</label>
+                                <select id="gFrom" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-medium">
+                                    <option value="" disabled selected>Select location...</option>
+                                    <option value="Manali">Manali</option>
+                                    <option value="Leh">Leh</option>
+                                    <option value="Zanskar">Zanskar</option>
+                                    <option value="Spiti">Spiti</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Permanent Address</label>
+                                <input type="text" id="gAddress" placeholder="Street, City, State" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-medium">
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-100 my-6"></div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="col-span-2 sm:col-span-1">
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Check-in *</label>
+                                <input type="date" id="gCheckIn" onchange="calculatePrice()" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-medium">
+                            </div>
+                            <div class="col-span-2 sm:col-span-1">
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Check-out *</label>
+                                <input type="date" id="gCheckOut" onchange="calculatePrice()" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-medium">
+                            </div>
+                            <div class="col-span-1">
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Adults</label>
+                                <input type="number" id="gAdults" min="1" value="2" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-semibold text-center">
+                            </div>
+                            <div class="col-span-1">
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Children</label>
+                                <input type="number" id="gChildren" min="0" value="0" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-luxury bg-gray-50/50 text-sm font-semibold text-center">
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200/80 mt-6 space-y-5">
+                            <h3 class="text-xs font-extrabold uppercase text-gray-400 tracking-wider">Choose Accommodation</h3>
+                            
+                            <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
+                                <div>
+                                    <div class="font-bold text-dark text-sm sm:text-base">Room 101: Luxury Family Suite</div>
+                                    <div class="text-xs text-gray-500 font-medium mt-0.5">₹<span id="displayPrice101">3999</span> / night</div>
+                                </div>
+                                <div class="relative inline-block w-14 align-middle select-none">
+                                    <input type="checkbox" id="gRoom101" onchange="calculatePrice()" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer top-0.5"/>
+                                    <label for="gRoom101" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer shadow-inner"></label>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
+                                <div>
+                                    <div class="font-bold text-dark text-sm sm:text-base">Cozy Standard Rooms</div>
+                                    <div class="text-xs text-gray-500 font-medium mt-0.5">Rooms 102 to 107 (₹<span id="displayPriceStd">2999</span> / night)</div>
+                                </div>
+                                <div class="flex items-center bg-gray-50 rounded-xl border border-gray-200 overflow-hidden shadow-xs">
+                                    <button type="button" onclick="updateStdRooms(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-gray-200 text-dark transition"><i class="fa-solid fa-minus text-xs"></i></button>
+                                    <span id="stdRoomCount" class="font-bold text-base w-10 text-center text-luxury">0</span>
+                                    <button type="button" onclick="updateStdRooms(1)" class="w-10 h-10 flex items-center justify-center hover:bg-gray-200 text-dark transition"><i class="fa-solid fa-plus text-xs"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right: Summary & WhatsApp -->
+                <div class="bg-dark text-white rounded-2xl shadow-2xl p-6 sm:p-8 h-fit sticky top-28 border border-gray-800">
+                    <h2 class="text-lg font-bold mb-4 border-b border-gray-800 pb-3 flex items-center gap-2"><i class="fa-solid fa-receipt text-luxury"></i> Booking Summary</h2>
+                    
+                    <div class="space-y-3.5 text-sm text-gray-300 mb-6 font-medium">
+                        <div class="flex justify-between"><span>Total Nights:</span> <span id="sumNights" class="font-bold text-white">0</span></div>
+                        <div class="flex justify-between"><span>Family Suite (101):</span> <span id="sumR101" class="font-bold text-white">No</span></div>
+                        <div class="flex justify-between"><span>Standard Rooms:</span> <span id="sumStd" class="font-bold text-white">0</span></div>
+                    </div>
+                    
+                    <div class="bg-gray-900/80 p-4 rounded-xl flex justify-between items-center border border-gray-800 mb-4">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Total Amount</span> 
+                            <span class="text-2xl font-extrabold text-luxury">₹<span id="sumTotal">0</span></span>
+                        </div>
+                        <span class="text-xs text-gray-400 italic">Inclusive of taxes</span>
+                    </div>
+
+                    <div id="availabilityError" class="bg-red-950/80 border border-red-600/50 text-red-200 p-3 rounded-xl text-xs font-medium hidden mb-4">
+                        <i class="fa-solid fa-triangle-exclamation mr-1.5 text-red-400"></i> Selected room(s) are already booked/locked on these dates.
+                    </div>
+                    
+                    <div id="dateWarningText" class="text-xs text-gray-400 text-center mb-5 font-light">
+                        *Select check-in & check-out dates to calculate total price.
+                    </div>
+
+                    <button type="button" onclick="bookViaWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-base py-4 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2.5 active:scale-[0.98]">
+                        <i class="fa-brands fa-whatsapp text-2xl"></i> Reserve via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECURE ADMIN PANEL ================= -->
+        <section id="admin-section" class="w-full hidden pb-24 fade-in bg-gray-100 min-h-screen">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                
+                <div class="flex justify-between items-center mb-8 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-luxury/10 border border-luxury/30 flex items-center justify-center text-luxury">
+                            <i class="fa-solid fa-shield-halved text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-dark">Admin Dashboard</h2>
+                            <p class="text-xs text-gray-500">Live world-wide cloud sync active.</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="logoutAdmin()" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-power-off"></i> Logout
+                    </button>
+                </div>
+
+                <!-- Admin Master Calendar -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-gray-100 pb-4 gap-3">
+                        <div>
+                            <h3 class="font-bold text-lg text-dark flex items-center gap-2"><i class="fa-solid fa-calendar-alt text-luxury"></i> Master Room-Wise Booking Calendar</h3>
+                            <p class="text-xs text-gray-500">Live view showing exactly which room numbers are booked.</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200">
+                            <button type="button" onclick="changeAdminMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 hover:bg-gray-100"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <span id="adminCalMonthYear" class="font-bold text-dark text-xs uppercase tracking-wider px-2">July 2026</span>
+                            <button type="button" onclick="changeAdminMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 hover:bg-gray-100"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-center text-[11px] font-bold text-gray-400 mb-2 uppercase">
+                        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                    </div>
+                    <div id="adminCalGrid" class="grid grid-cols-7 gap-2"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Price Settings -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 border-t-4 border-t-luxury">
+                            <h3 class="font-bold text-base mb-4 text-dark flex items-center gap-2"><i class="fa-solid fa-indian-rupee-sign text-luxury"></i> Room Pricing Settings</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Room 101 Price</label>
+                                    <input type="number" id="adminPrice101" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-luxury outline-none bg-gray-50 font-bold text-dark text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Standard Room Price</label>
+                                    <input type="number" id="adminPriceStd" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-luxury outline-none bg-gray-50 font-bold text-dark text-sm">
+                                </div>
+                                <button type="button" onclick="savePrices()" class="w-full bg-dark text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition shadow">Update Prices</button>
+                            </div>
+                        </div>
+
+                        <!-- Room Locker -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 border-t-4 border-t-red-500">
+                            <h3 class="font-bold text-base mb-4 text-dark flex items-center gap-2"><i class="fa-solid fa-lock text-red-500"></i> Lock Dates & Save Notes</h3>
+                            <form id="adminLockForm" onsubmit="event.preventDefault(); lockRooms();" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">From Date</label>
+                                        <input type="date" id="adminFromDate" required class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-medium">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">To Date</label>
+                                        <input type="date" id="adminToDate" required class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-xs font-medium">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Select Rooms to Lock</label>
+                                    <div class="grid grid-cols-4 gap-2">
+                                        <label class="flex items-center justify-center space-x-1.5 bg-gray-50 hover:bg-gray-100 p-2 rounded-xl border border-gray-200 cursor-pointer transition"><input type="checkbox" value="101" class="admin-room-check w-4 h-4 text-luxury focus:ring-luxury rounded"><span class="text-xs font-bold">101</span></label>
+                                        <label class="flex items-center justify-center space-x-1.5 bg-gray-50 hover:bg-gray-100 p-2 rounded-xl border border-gray-200 cursor-pointer transition"><input type="checkbox" value="102" class="admin-room-check w-4 h-4 text-luxury focus:ring-luxury rounded"><span class="text-xs font-bold">102</span></label>
+                                        <label class="flex items-center justify-center space-x-1.5 bg-gray-50 hover:bg-gray-100 p-2 rounded-xl border border-gray-200 cursor-pointer transition"><input type="checkbox" value="103" class="admin-room-check w-4 h-4 text-luxury focus:ring-luxury rounded"><span class="text-xs font-bold">103</span></label>
+                                        <label class="flex items-center justify-center space-x-1.5 bg-gray-50 hover:bg-gray-100 p-2 rounded-xl border border-gray-200 cursor-pointer transition"><input type="checkbox" value="104" class="admin-room-check w-4 h-4 text-luxury focus:ring-luxury rounded"><span class="text-xs font-bold">104</span></label>
+                                        <label class="flex items-center justify-center space-x-1.5 bg-gray-50 hover:bg-gray-100 p-2 rounded-xl border border-gray-200 cursor-pointer transition"><input type="checkbox" value="105" class="admin-room-check w-4 h-4 text-luxury focus:ring-luxury rounded"><span class="text-xs font-bold">105</span></label>
+                                        <label class="flex items-center justify-center space-x-1.5 bg-gray-50 hover:bg-gray-100 p-2 rounded-xl border border-gray-200 cursor-pointer transition"><input type="checkbox" value="106" class="admin-room-check w-4 h-4 text-luxury focus:ring-luxury rounded"><span class="text-xs font-bold">106</span></label>
+                                        <label class="flex items-center justify-center space-x-1.5 bg-gray-50 hover:bg-gray-100 p-2 rounded-xl border border-gray-200 cursor-pointer transition"><input type="checkbox" value="107" class="admin-room-check w-4 h-4 text-luxury focus:ring-luxury rounded"><span class="text-xs font-bold">107</span></label>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 pt-4 border-t border-gray-100">
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Guest Notes / Record Sheet</label>
+                                    <textarea id="adminGuestDetails" rows="3" placeholder="Name, Phone, Advance, Remarks..." class="w-full p-3 border border-gray-200 rounded-xl bg-amber-50/50 focus:outline-none focus:ring-2 focus:ring-luxury text-xs text-gray-800 font-medium"></textarea>
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-red-700 transition flex items-center justify-center gap-2 shadow-md mt-4">
+                                    <i class="fa-solid fa-lock"></i> Lock Rooms & Save
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Ledger Table -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
+                            <div class="p-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                                <h3 class="font-bold text-base text-dark flex items-center gap-2"><i class="fa-solid fa-book-open text-luxury"></i> Upcoming Guest & Lock Ledger</h3>
+                                <span class="text-[11px] text-gray-400 font-medium">*Sorted by nearest check-in date</span>
+                            </div>
+                            <div class="overflow-x-auto flex-1">
+                                <table class="w-full text-left border-collapse min-w-[650px]">
+                                    <thead>
+                                        <tr class="bg-dark text-white text-[11px] uppercase tracking-wider">
+                                            <th class="p-4 py-3 border-b border-gray-800 w-1/4">Dates Range</th>
+                                            <th class="p-4 py-3 border-b border-gray-800 w-1/6">Rooms</th>
+                                            <th class="p-4 py-3 border-b border-gray-800 w-2/4">Guest Details / Notes</th>
+                                            <th class="p-4 py-3 border-b border-gray-800 w-1/12 text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ledgerTableBody" class="text-sm text-gray-800 divide-y divide-gray-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 hidden flex items-center justify-center px-4">
+        <div class="bg-white p-8 rounded-2xl w-full max-w-sm fade-in relative shadow-2xl border border-gray-100">
+            <button type="button" onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-xl text-dark"><i class="fa-solid fa-lock"></i></div>
+                <h2 class="text-xl font-bold text-dark">Admin Verification</h2>
+            </div>
+            <form onsubmit="event.preventDefault(); verifyLogin();" class="space-y-4">
+                <input type="text" id="loginUser" placeholder="Username" required class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-dark text-sm font-medium">
+                <input type="password" id="loginPass" placeholder="Password" required class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-dark text-sm font-medium">
+                <div id="loginError" class="text-red-500 text-xs hidden font-bold text-center">Incorrect Credentials!</div>
+                <button type="submit" class="w-full bg-dark text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition shadow">Access Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="calendarModal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 hidden flex items-center justify-center px-4">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-md fade-in relative shadow-2xl border border-gray-100">
+            <button type="button" onclick="closeModal('calendarModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h2 class="text-lg font-bold text-dark mb-4 border-b border-gray-100 pb-3 flex items-center gap-2"><i class="fa-regular fa-calendar-check text-luxury"></i> Availability Calendar</h2>
+            <div class="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-xl border border-gray-200">
+                <button type="button" onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 hover:bg-gray-100"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                <span id="calMonthYear" class="font-bold text-dark text-sm uppercase tracking-wider">July 2026</span>
+                <button type="button" onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 hover:bg-gray-100"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+            </div>
+            <div class="grid grid-cols-7 gap-1.5 text-center text-[11px] font-bold text-gray-400 mb-2 uppercase">
+                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+            </div>
+            <div id="calGrid" class="grid grid-cols-7 gap-1.5 text-center text-xs font-medium"></div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="fixed inset-0 bg-black/80 backdrop-blur-xs z-[60] hidden flex items-center justify-center px-4">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm fade-in text-center shadow-2xl border-t-8 border-t-red-600">
+            <i class="fa-solid fa-triangle-exclamation text-4xl text-red-500 mb-3"></i>
+            <h3 class="text-lg font-bold text-dark mb-1">Delete this record?</h3>
+            <p class="text-xs text-gray-500 mb-6 font-light">This action will unlock the rooms for public bookings immediately.</p>
+            <div class="flex gap-3 justify-center">
+                <button type="button" onclick="closeModal('deleteModal')" class="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-200">Cancel</button>
+                <button type="button" id="confirmDeleteBtn" class="px-4 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Engine with Firebase Realtime Sync -->
+    <script>
+        // --- 1. FIREBASE CONFIGURATION (Aapke project ki details jud chuki hain) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHJLi_U9mdiotu325gCYV6",
+            authDomain: "pahadi-ghar-bookig.firebaseapp.com",
+            databaseURL: "https://pahadi-ghar-bookig-default-rtdb.firebaseio.com",
+            projectId: "pahadi-ghar-bookig",
+            storageBucket: "pahadi-ghar-bookig.appspot.com",
+            messagingSenderId: "6009453258",
+            appId: "1:6009453258:web:2c5966572022"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let prices = { room101: 3999, standard: 2999 };
+        let bookings = {};
+        
+        let stdRooms = 0;
+        let currentCalDate = new Date();
+        let currentAdminCalDate = new Date();
+        
+        // --- 2. LIVE REALTIME SYNC LISTENERS ---
+        function initApp() {
+            db.ref('pahadi_prices').on('value', (snapshot) => {
+                let data = snapshot.val();
+                if(data) {
+                    prices = data;
+                } else {
+                    db.ref('pahadi_prices').set(prices);
+                }
+                document.getElementById('displayPrice101').innerText = prices.room101;
+                document.getElementById('displayPriceStd').innerText = prices.standard;
+                document.getElementById('adminPrice101').value = prices.room101;
+                document.getElementById('adminPriceStd').value = prices.standard;
+                calculatePrice();
+            });
+
+            db.ref('pahadi_bookings').on('value', (snapshot) => {
+                bookings = snapshot.val() || {};
+                calculatePrice();
+                fetchLedger();
+                buildAdminCalendar();
+                buildCalendar();
+            });
+
+            document.getElementById('gRoom101').checked = false;
+        }
+
+        function showSection(id) {
+            document.getElementById('public-section').classList.add('hidden');
+            document.getElementById('admin-section').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
+            window.scrollTo(0,0);
+            if(id === 'admin-section') {
+                buildAdminCalendar();
+            }
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function toggleAdminLogin() {
+            if(sessionStorage.getItem('isAdmin') === 'true') {
+                showSection('admin-section');
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
+            }
+        }
+
+        function updateStdRooms(val) {
+            stdRooms += val;
+            if(stdRooms < 0) stdRooms = 0;
+            if(stdRooms > 6) stdRooms = 6;
+            document.getElementById('stdRoomCount').innerText = stdRooms;
+            calculatePrice();
+        }
+
+        function getDatesInRange(start, end) {
+            let dates = [];
+            let curr = new Date(start);
+            let e = new Date(end);
+            while(curr < e) {
+                dates.push(curr.toISOString().split('T')[0]);
+                curr.setDate(curr.getDate() + 1);
+            }
+            return dates;
+        }
+
+        function isAvailable(cIn, cOut, want101, wantStd) {
+            if(!cIn || !cOut) return true;
+            let reqDates = getDatesInRange(cIn, cOut);
+            
+            for(let d of reqDates) {
+                let count101 = 0;
+                let countStd = 0;
+                
+                Object.values(bookings).forEach(b => {
+                    if(getDatesInRange(b.from, b.to).includes(d)) {
+                        if(b.rooms.includes("101")) count101 = 1;
+                        b.rooms.forEach(r => { if(r !== "101") countStd++; });
+                    }
+                });
+
+                if(want101 && count101 > 0) return false;
+                if(wantStd > (6 - countStd)) return false;
+            }
+            return true;
+        }
+
+        function calculatePrice() {
+            let cIn = document.getElementById('gCheckIn').value;
+            let cOut = document.getElementById('gCheckOut').value;
+            let wnt101 = document.getElementById('gRoom101').checked;
+            
+            document.getElementById('sumR101').innerText = wnt101 ? "Yes" : "No";
+            document.getElementById('sumStd').innerText = stdRooms;
+
+            let total = 0;
+            let nights = 0;
+            let errBox = document.getElementById('availabilityError');
+            let warnText = document.getElementById('dateWarningText');
+
+            if (cIn && cOut) {
+                let d1 = new Date(cIn);
+                let d2 = new Date(cOut);
+                nights = (d2 - d1) / (1000 * 60 * 60 * 24);
+                
+                if (nights > 0) {
+                    warnText.classList.add('hidden');
+                    if(!isAvailable(cIn, cOut, wnt101, stdRooms)) {
+                        errBox.classList.remove('hidden');
+                        total = 0;
+                    } else {
+                        errBox.classList.add('hidden');
+                        total = nights * ((wnt101 ? prices.room101 : 0) + (stdRooms * prices.standard));
+                    }
+                } else {
+                    nights = 0;
+                    errBox.classList.add('hidden');
+                    warnText.classList.remove('hidden');
+                }
+            } else {
+                warnText.classList.remove('hidden');
+                errBox.classList.add('hidden');
+            }
+
+            document.getElementById('sumNights').innerText = nights;
+            document.getElementById('sumTotal').innerText = total;
+        }
+
+        function bookViaWhatsApp() {
+            let name = document.getElementById('gName').value.trim();
+            let phone = document.getElementById('gPhone').value.trim();
+            let email = document.getElementById('gEmail').value.trim();
+            let from = document.getElementById('gFrom').value;
+            let addr = document.getElementById('gAddress').value.trim();
+            let cin = document.getElementById('gCheckIn').value;
+            let cout = document.getElementById('gCheckOut').value;
+            let adlt = document.getElementById('gAdults').value;
+            let chld = document.getElementById('gChildren').value;
+            let w101 = document.getElementById('gRoom101').checked;
+            let total = document.getElementById('sumTotal').innerText;
+
+            if(!name || !phone || !from || !cin || !cout) {
+                alert("Please fill all required fields (*) including Check-in/Check-out dates.");
+                return;
+            }
+
+            if(new Date(cin) >= new Date(cout)) {
+                alert("Check-out date must be after Check-in date.");
+                return;
+            }
+
+            if(!w101 && stdRooms === 0) {
+                alert("Please select at least one room to continue.");
+                return;
+            }
+
+            if(!document.getElementById('availabilityError').classList.contains('hidden')) {
+                alert("Selected rooms are unavailable on these dates.");
+                return;
+            }
+
+            let text = 
+`*THE PAHADI GHAR - BOOKING REQUEST*
+
+*👤 Guest information:*
+
+Guest Name: ${name}
+Phone: ${phone}
+${email ? `Email: ${email}\n` : ''}
+*Coming From:* ${from}
+${addr ? `Address: ${addr}\n` : ''}
+
+*📆 Stay Details:*
+
+Check-in: ${cin}
+Check-out: ${cout}
+Guests: ${adlt} Adults, ${chld} Children
+
+*🛌 Rooms:*
+
+- Family Suite (101): ${w101 ? 'YES' : 'NO'}
+- Standard Rooms: ${stdRooms}
+
+*💰 TOTAL:* ₹${total}`;
+
+            window.location.href = `https://wa.me/917876631873?text=${encodeURIComponent(text)}`;
+        }
+
+        function openCalendarModal() {
+            currentCalDate = new Date(); 
+            buildCalendar();
+            document.getElementById('calendarModal').classList.remove('hidden');
+        }
+
+        function changeMonth(dir) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+            buildCalendar();
+        }
+
+        function buildCalendar() {
+            const grid = document.getElementById('calGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            let y = currentCalDate.getFullYear();
+            let m = currentCalDate.getMonth();
+            document.getElementById('calMonthYear').innerText = currentCalDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+            
+            let firstDay = new Date(y, m, 1).getDay();
+            let daysInM = new Date(y, m + 1, 0).getDate();
+            
+            for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+
+            for(let i=1; i<=daysInM; i++) {
+                let dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                
+                let bookedRoomsCount = 0;
+                Object.values(bookings).forEach(b => {
+                    if(getDatesInRange(b.from, b.to).includes(dStr)) {
+                        bookedRoomsCount += b.rooms.length;
+                    }
+                });
+
+                let leftRooms = 7 - bookedRoomsCount;
+                let cls = "bg-green-50 border border-green-200 text-green-900";
+                let badgeText = "";
+
+                if (bookedRoomsCount >= 7) {
+                    cls = "bg-red-100 border border-red-300 text-red-900 font-bold";
+                    badgeText = `<span class="block text-[9px] text-red-600 font-bold uppercase tracking-tight">Full</span>`;
+                } else if (bookedRoomsCount > 0) {
+                    cls = "bg-yellow-50 border border-yellow-300 text-yellow-900 font-bold";
+                    badgeText = `<span class="block text-[9px] text-amber-600 font-bold uppercase tracking-tight">${leftRooms} left</span>`;
+                } else {
+                    badgeText = `<span class="block text-[9px] text-green-600 font-medium uppercase tracking-tight">Free</span>`;
+                }
+
+                grid.innerHTML += `
+                    <div class="${cls} rounded-xl p-1.5 flex flex-col justify-center items-center transition shadow-2xs">
+                        <span class="text-xs font-bold leading-none mb-0.5">${i}</span>
+                        ${badgeText}
+                    </div>
+                `;
+            }
+        }
+
+        function changeAdminMonth(dir) {
+            currentAdminCalDate.setMonth(currentAdminCalDate.getMonth() + dir);
+            buildAdminCalendar();
+        }
+
+        function buildAdminCalendar() {
+            const grid = document.getElementById('adminCalGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            let y = currentAdminCalDate.getFullYear();
+            let m = currentAdminCalDate.getMonth();
+            document.getElementById('adminCalMonthYear').innerText = currentAdminCalDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+            
+            let firstDay = new Date(y, m, 1).getDay();
+            let daysInM = new Date(y, m + 1, 0).getDate();
+            
+            for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+
+            for(let i=1; i<=daysInM; i++) {
+                let dStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                
+                let dayBookedRooms = [];
+                Object.values(bookings).forEach(b => {
+                    if(getDatesInRange(b.from, b.to).includes(dStr)) {
+                        b.rooms.forEach(r => {
+                            if(!dayBookedRooms.includes(r)) dayBookedRooms.push(r);
+                        });
+                    }
+                });
+
+                dayBookedRooms.sort((a,b) => a - b);
+                
+                let cls = "bg-green-50 border border-green-200 text-green-900";
+                let badgeHTML = `<span class="block text-[9px] text-green-600 font-bold mt-1">All Free</span>`;
+
+                if(dayBookedRooms.length > 0) {
+                    if(dayBookedRooms.length >= 7) {
+                        cls = "bg-red-100 border border-red-300 text-red-900";
+                    } else {
+                        cls = "bg-amber-50 border border-amber-300 text-amber-900";
+                    }
+                    let roomBadges = dayBookedRooms.map(r => `<span class="bg-dark text-luxury font-bold text-[9px] px-1 rounded">${r}</span>`).join(' ');
+                    badgeHTML = `<div class="flex flex-wrap justify-center gap-0.5 mt-1">${roomBadges}</div>`;
+                }
+
+                grid.innerHTML += `
+                    <div class="${cls} rounded-xl p-2 flex flex-col justify-between items-center transition min-h-[70px]">
+                        <span class="text-xs font-bold text-dark">${i}</span>
+                        ${badgeHTML}
+                    </div>
+                `;
+            }
+        }
+
+        function verifyLogin() {
+            let u = document.getElementById('loginUser').value;
+            let p = document.getElementById('loginPass').value;
+            if(u === 'pahadi.ghar' && p === '123890') {
+                sessionStorage.setItem('isAdmin', 'true');
+                closeModal('loginModal');
+                showSection('admin-section');
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('isAdmin');
+            showSection('public-section');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function savePrices() {
+            let new101 = parseInt(document.getElementById('adminPrice101').value) || prices.room101;
+            let newStd = parseInt(document.getElementById('adminPriceStd').value) || prices.standard;
+
+            db.ref('pahadi_prices').set({ room101: new101, standard: newStd }).then(() => {
+                alert("Prices Updated Worldwide!");
+            });
+        }
+
+        function lockRooms() {
+            let from = document.getElementById('adminFromDate').value;
+            let to = document.getElementById('adminToDate').value;
+            let details = document.getElementById('adminGuestDetails').value.trim();
+            
+            let checkedRooms = [];
+            document.querySelectorAll('.admin-room-check:checked').forEach(cb => checkedRooms.push(cb.value));
+
+            if(!from || !to || checkedRooms.length === 0) {
+                alert("Please select date range and check at least one room.");
+                return;
+            }
+            if(new Date(from) >= new Date(to)) {
+                alert("To Date must be after From Date.");
+                return;
+            }
+
+            let bId = db.ref('pahadi_bookings').push().key;
+            let newBooking = { from, to, rooms: checkedRooms, guestDetails: details || "No details provided." };
+
+            db.ref('pahadi_bookings/' + bId).set(newBooking).then(() => {
+                document.getElementById('adminLockForm').reset();
+                alert("Rooms Locked & Synced Worldwide!");
+            });
+        }
+
+        function fetchLedger() {
+            let tbody = document.getElementById('ledgerTableBody');
+            tbody.innerHTML = '';
+            
+            let ids = Object.keys(bookings).sort((a,b) => new Date(bookings[a].from) - new Date(bookings[b].from));
+            
+            if(ids.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 font-medium text-xs uppercase tracking-wider">No active bookings or locks found.</td></tr>`;
+                return;
+            }
+
+            ids.forEach(id => {
+                let b = bookings[id];
+                let formattedDetails = b.guestDetails.replace(/\n/g, '<br>');
+                
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition";
+                tr.innerHTML = `
+                    <td class="p-4 border-b border-gray-100 whitespace-nowrap align-top">
+                        <div class="font-bold text-dark text-xs">${b.from}</div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">To: ${b.to}</div>
+                    </td>
+                    <td class="p-4 border-b border-gray-100 align-top">
+                        <div class="flex flex-wrap gap-1">
+                            ${b.rooms.map(r => `<span class="bg-dark text-luxury font-bold text-[10px] px-2 py-0.5 rounded">${r}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td class="p-4 border-b border-gray-100 text-xs text-gray-700 bg-amber-50/20 font-medium align-top leading-relaxed">
+                        ${formattedDetails}
+                    </td>
+                    <td class="p-4 border-b border-gray-100 text-center align-top">
+                        <button type="button" onclick="triggerDelete('${id}')" class="text-red-500 hover:text-white hover:bg-red-600 p-2 rounded-lg transition border border-red-200"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        let currentDeleteId = null;
+        function triggerDelete(id) {
+            currentDeleteId = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            if(currentDeleteId) {
+                db.ref('pahadi_bookings/' + currentDeleteId).remove().then(() => {
+                    closeModal('deleteModal');
+                    alert("Booking deleted and rooms unlocked worldwide!");
+                });
+            }
+        });
+
+        initApp();
+    </script>
+</body>
+</html>
