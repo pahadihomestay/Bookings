@@ -1,23 +1,559 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Pahadi Ghar - Darcha | Homestay</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Premium Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts for Luxury Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>The Pahadi Ghar - Admin Portal</title>
+    <!-- Google Fonts for Premium Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- jsPDF Library for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        /* Luxury Light Theme Colors & Reset */
+        :root {
+            --primary: #C5A880; /* Premium Muted Gold/Sand */
+            --primary-hover: #B0926A;
+            --secondary: #6B705C; /* Elegant Sage/Olive Grey */
+            --bg-color: #F9F8F6; /* Warm Ivory */
+            --card-bg: #FFFFFF;
+            --text-main: #2C2C2C; /* Soft Black */
+            --text-muted: #757575;
+            --border-color: #E6E2DD;
+            --danger: #C87979; /* Muted Red */
+            --booked-bg: #FDF3F3;
+            --booked-text: #B46464;
+            --free-bg: #F4F7F4;
+            --free-text: #6B806B;
+        }
 
-    <!-- Firebase SDKs with Provided Config -->
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Cinzel', serif; /* Luxury Serif for headings */
+        }
+
+        /* Login Screen */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #F9F8F6 0%, #EFEBE4 100%);
+        }
+
+        .login-box {
+            background: var(--card-bg);
+            padding: 50px 40px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+            border: 1px solid var(--border-color);
+        }
+
+        .login-box h2 {
+            margin-bottom: 10px;
+            color: var(--primary-hover);
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            background: #FCFBFA;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.1);
+            background: #fff;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(176, 146, 106, 0.2);
+        }
+
+        /* Main Dashboard Layout */
+        #main-app {
+            display: none;
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: var(--primary-hover);
+            letter-spacing: 1px;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            width: auto;
+            padding: 10px 20px;
+            font-size: 13px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tabs button {
+            width: auto;
+            background: transparent;
+            color: var(--text-muted);
+            border: 2px solid var(--border-color);
+            padding: 12px 25px;
+            font-weight: 600;
+        }
+
+        .nav-tabs button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px 60px 20px;
+        }
+
+        .section {
+            display: none;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--secondary);
+            font-size: 22px;
+        }
+
+        /* Form Grid System */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-color);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .checkbox-group label:hover {
+            border-color: var(--primary);
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--bg-color);
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: #FCFBFA;
+        }
+
+        .action-btn {
+            padding: 8px 14px;
+            font-size: 12px;
+            width: auto;
+            margin-right: 8px;
+            border-radius: 6px;
+        }
+        .btn-pdf { background: var(--secondary); }
+        .btn-delete { background: var(--danger); }
+
+        /* Calendar Matrix */
+        .calendar-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .calendar-matrix {
+            display: grid;
+            grid-template-columns: 120px repeat(14, minmax(100px, 1fr));
+            gap: 1px;
+            background: var(--border-color);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            border-radius: 12px;
+        }
+
+        .cal-header, .cal-cell, .cal-room {
+            background: var(--card-bg);
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .cal-header { font-weight: 600; background: var(--bg-color); color: var(--text-muted); }
+        .cal-room { font-weight: 600; background: var(--bg-color); text-align: left; color: var(--secondary); }
+        
+        .status-free { background: var(--free-bg); color: var(--free-text); }
+        .status-booked { background: var(--booked-bg); color: var(--booked-text); font-weight: 500; cursor: pointer;}
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        .modal-content h3 { margin-bottom: 20px; color: var(--danger); font-family: 'Montserrat', sans-serif; font-weight: 600; }
+        .modal-actions { display: flex; gap: 15px; margin-top: 25px; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; text-align: center; padding: 20px; }
+            .nav-tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>The Pahadi Ghar</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 14px;">Admin Portal Login</p>
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <p id="login-error" style="color: var(--danger); font-size: 13px; margin-bottom: 15px; display: none;">Invalid credentials!</p>
+            <button onclick="login()">Access Portal</button>
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div id="main-app">
+        <header>
+            <h1>The Pahadi Ghar - Darcha</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="active" onclick="switchTab('booking-tab')" id="btn-booking-tab">Booking Register</button>
+            <button onclick="switchTab('guest-tab')" id="btn-guest-tab">Guest Register</button>
+            <button onclick="switchTab('calendar-tab')" id="btn-calendar-tab">Room Calendar</button>
+        </div>
+
+        <div class="container">
+            
+            <!-- BOOKING REGISTER TAB -->
+            <div id="booking-tab" class="section active">
+                <h2 class="section-title">New Booking Entry</h2>
+                <div class="form-grid">
+                    <div class="input-group"><label>Guest Name</label><input type="text" id="b-name"></div>
+                    <div class="input-group"><label>Phone Number</label><input type="number" id="b-phone"></div>
+                    <div class="input-group"><label>Check-in Date</label><input type="date" id="b-cin" onchange="calcDurationB()"></div>
+                    <div class="input-group"><label>Check-out Date</label><input type="date" id="b-cout" onchange="calcDurationB()"></div>
+                    <div class="input-group"><label>Total Duration (Days)</label><input type="number" id="b-duration" readonly style="background:var(--bg-color);"></div>
+                    <div class="input-group"><label>Adults</label><input type="number" id="b-adults" value="1"></div>
+                    <div class="input-group"><label>Children</label><input type="number" id="b-children" value="0"></div>
+                    
+                    <div class="input-group full-width">
+                        <label>Select Rooms</label>
+                        <div class="checkbox-group" id="b-rooms-container">
+                            <label><input type="checkbox" value="101" onchange="countRoomsB()"> 101 (Family)</label>
+                            <label><input type="checkbox" value="102" onchange="countRoomsB()"> 102</label>
+                            <label><input type="checkbox" value="103" onchange="countRoomsB()"> 103</label>
+                            <label><input type="checkbox" value="104" onchange="countRoomsB()"> 104</label>
+                            <label><input type="checkbox" value="105" onchange="countRoomsB()"> 105</label>
+                            <label><input type="checkbox" value="106" onchange="countRoomsB()"> 106</label>
+                            <label><input type="checkbox" value="107" onchange="countRoomsB()"> 107</label>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group"><label>Total Rooms Booked</label><input type="number" id="b-room-count" readonly style="background:var(--bg-color);"></div>
+                    <div class="input-group">
+                        <label>Meal Plan</label>
+                        <select id="b-meal">
+                            <option value="No Meal">No Meal</option>
+                            <option value="Dinner & Breakfast">Dinner & Breakfast Include</option>
+                            <option value="Only Dinner">Only Dinner Include</option>
+                            <option value="Only Breakfast">Only Breakfast Include</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Total Payment (₹)</label><input type="number" id="b-total" oninput="calcPayment()"></div>
+                    <div class="input-group"><label>Advance Paid (₹)</label><input type="number" id="b-advance" oninput="calcPayment()"></div>
+                    <div class="input-group"><label>Balance Pending (₹)</label><input type="number" id="b-balance" readonly style="background:var(--bg-color); color: var(--danger); font-weight: bold;"></div>
+                    
+                    <div class="input-group full-width">
+                        <button onclick="submitBooking()">Submit Booking</button>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 50px;">Booking History</h2>
+                <div class="input-group" style="max-width: 320px;">
+                    <label>Search by Date (Find nearest bookings)</label>
+                    <input type="date" id="b-search-date" onchange="renderBookings()">
+                </div>
+                <div class="table-responsive">
+                    <table id="booking-table">
+                        <thead>
+                            <tr>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Rooms</th>
+                                <th>Meal Plan</th>
+                                <th>Total (₹)</th>
+                                <th>Balance (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Populated via Firebase Realtime --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GUEST REGISTER TAB -->
+            <div id="guest-tab" class="section">
+                <h2 class="section-title">In-House Guest Entry</h2>
+                <div class="form-grid">
+                    <div class="input-group"><label>Guest Name</label><input type="text" id="g-name"></div>
+                    <div class="input-group"><label>Phone Number</label><input type="number" id="g-phone"></div>
+                    <div class="input-group"><label>Address</label><input type="text" id="g-address"></div>
+                    <div class="input-group"><label>ID Number (Aadhar/Passport)</label><input type="text" id="g-id"></div>
+                    <div class="input-group"><label>Vehicle Number</label><input type="text" id="g-vehicle"></div>
+                    <div class="input-group"><label>Coming From</label><input type="text" id="g-coming"></div>
+                    <div class="input-group"><label>Going To</label><input type="text" id="g-going"></div>
+                    
+                    <div class="input-group"><label>Check-in Date</label><input type="date" id="g-cin" onchange="calcDurationG()"></div>
+                    <div class="input-group"><label>Check-out Date</label><input type="date" id="g-cout" onchange="calcDurationG()"></div>
+                    <div class="input-group"><label>Duration (Days)</label><input type="number" id="g-duration" readonly style="background:var(--bg-color);"></div>
+                    
+                    <div class="input-group full-width">
+                        <label>Allocated Rooms</label>
+                        <div class="checkbox-group" id="g-rooms-container">
+                            <label><input type="checkbox" value="101" onchange="countRoomsG()"> 101</label>
+                            <label><input type="checkbox" value="102" onchange="countRoomsG()"> 102</label>
+                            <label><input type="checkbox" value="103" onchange="countRoomsG()"> 103</label>
+                            <label><input type="checkbox" value="104" onchange="countRoomsG()"> 104</label>
+                            <label><input type="checkbox" value="105" onchange="countRoomsG()"> 105</label>
+                            <label><input type="checkbox" value="106" onchange="countRoomsG()"> 106</label>
+                            <label><input type="checkbox" value="107" onchange="countRoomsG()"> 107</label>
+                        </div>
+                    </div>
+                    <div class="input-group"><label>Total Rooms</label><input type="number" id="g-room-count" readonly style="background:var(--bg-color);"></div>
+                    
+                    <div class="input-group"><label>Male Guests</label><input type="number" id="g-male" value="0"></div>
+                    <div class="input-group"><label>Female Guests</label><input type="number" id="g-female" value="0"></div>
+                    <div class="input-group"><label>Children</label><input type="number" id="g-child" value="0"></div>
+                    
+                    <div class="input-group full-width"><label>Remarks / Notes</label><textarea id="g-remarks" rows="3" placeholder="Any extra information..."></textarea></div>
+
+                    <div class="input-group full-width">
+                        <button onclick="submitGuest()">Submit Guest Entry</button>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 50px;">Guest History</h2>
+                <div class="table-responsive">
+                    <table id="guest-table">
+                        <thead>
+                            <tr>
+                                <th>Entry Date</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>ID Details</th>
+                                <th>Vehicle</th>
+                                <th>From - To</th>
+                                <th>Rooms</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Populated via Firebase Realtime --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CALENDAR TAB -->
+            <div id="calendar-tab" class="section">
+                <h2 class="section-title">Room Availability Calendar</h2>
+                <div class="calendar-controls">
+                    <label style="font-weight: 500; font-size: 14px;">Start Date:</label>
+                    <input type="date" id="cal-start-date" onchange="renderCalendar()" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Montserrat';">
+                    <button style="width:auto; padding: 10px 20px;" onclick="renderCalendar()">Refresh Calendar</button>
+                </div>
+                <div class="table-responsive">
+                    <div class="calendar-matrix" id="calendar-matrix">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Clash Alert Modal -->
+    <div id="clash-modal" class="modal">
+        <div class="modal-content">
+            <h3>Room Clash Detected!</h3>
+            <p id="clash-message" style="margin-bottom:20px; line-height: 1.6;"></p>
+            <div class="modal-actions">
+                <button onclick="closeModal('clash-modal')" style="background:var(--secondary);">Close & Adjust Dates</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--danger);">Confirm Deletion</h3>
+            <p style="margin-bottom:20px; line-height: 1.6;">Are you sure you want to permanently delete this entry? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="confirm-delete-btn" style="background:var(--danger);">Yes, Delete</button>
+                <button onclick="closeModal('delete-modal')" style="background:var(--text-muted);">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Imports via CDN (Modular Version) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, update, remove, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDIVV8uBQJnEvhS0Hvw-d8fm-BV-ZAUY0Q",
@@ -29,1055 +565,545 @@
             measurementId: "G-LEP2RD7LTG"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getDatabase(app);
 
-        window.db = db;
-        window.dbRef = ref;
-        window.dbSet = set;
-        window.dbGet = get;
-        window.dbChild = child;
-        window.dbRemove = remove;
-        
-        window.dispatchEvent(new Event('firebase-ready'));
-    </script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        luxuryGold: '#C5A880',
-                        luxuryDarkGold: '#A38456',
-                        luxuryLightBg: '#FBF9F6',
-                        luxuryText: '#2B2A27',
-                        luxuryDarkBg: '#131D1A', 
-                    },
-                    fontFamily: {
-                        cinzel: ['Cinzel', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FBF9F6; color: #2B2A27; overflow-x: hidden; }
-        .luxury-heading { font-family: 'Cinzel', serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .fab-container:hover .fab-options { opacity: 1; transform: translateY(-10px) scale(1); pointer-events: auto; }
-        
-        /* Custom Switch Toggle Styles */
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        input:checked + .slider { background-color: #C5A880; }
-        input:checked + .slider:before { transform: translateX(24px); }
-    </style>
-</head>
-<body class="antialiased selection:bg-luxuryGold/30">
-
-    <!-- ================= NAVBAR ================= -->
-    <nav class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-luxuryGold/15 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex-shrink-0 flex flex-col">
-                    <span class="luxury-heading text-lg sm:text-xl font-bold tracking-widest text-luxuryText flex items-center gap-2">
-                        <i class="fa-solid fa-mountain-sun text-luxuryGold"></i> THE PAHADI GHAR
-                    </span>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-luxuryGold mt-0.5">Darcha • L&S</span>
-                </div>
-
-                <div class="hidden lg:flex items-center space-x-8 font-medium text-sm text-gray-600">
-                    <a href="#about" class="hover:text-luxuryGold transition-colors">About</a>
-                    <a href="#rooms" class="hover:text-luxuryGold transition-colors">Rooms</a>
-                    <a href="#dining" class="hover:text-luxuryGold transition-colors">Dining</a>
-                    <a href="#reviews" class="hover:text-luxuryGold transition-colors">Reviews</a>
-                    <a href="#facilities" class="hover:text-luxuryGold transition-colors">Facilities</a>
-                    <a href="#contact" class="hover:text-luxuryGold transition-colors">Contact</a>
-                    <button onclick="openAdminModal()" class="text-xs uppercase bg-gray-100 hover:bg-luxuryGold hover:text-white px-3 py-1.5 rounded transition-all tracking-wider font-bold text-gray-700">
-                        <i class="fa-solid fa-lock-open mr-1"></i> Admin
-                    </button>
-                </div>
-
-                <div class="hidden sm:flex items-center space-x-4">
-                    <a href="https://instagram.com/pahadi.ghar" target="_blank" class="flex items-center gap-2 text-sm font-semibold border border-luxuryGold/30 px-3 py-2 rounded-full hover:bg-luxuryGold/10 transition-all text-luxuryText">
-                        <i class="fa-brands fa-instagram text-pink-600 text-lg"></i> <span>@pahadi.ghar</span>
-                    </a>
-                    <a href="#rooms" class="bg-luxuryGold hover:bg-luxuryDarkGold text-white font-semibold text-sm px-5 py-2.5 rounded-full shadow-md transition-all tracking-wide">
-                        Book Now
-                    </a>
-                </div>
-
-                <div class="lg:hidden flex items-center space-x-3">
-                    <button onclick="openAdminModal()" class="text-xs bg-gray-100 px-2.5 py-1.5 rounded font-bold text-gray-600">Admin</button>
-                    <button id="mobileMenuBtn" class="text-luxuryText focus:outline-none p-2 rounded-lg hover:bg-gray-100">
-                        <i class="fa-solid fa-ellipsis-vertical text-2xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="mobileDrawer" class="hidden lg:hidden bg-white border-b border-luxuryGold/20 px-4 pt-2 pb-6 space-y-3 absolute top-20 left-0 w-full shadow-xl">
-            <a href="#about" onclick="toggleMenu()" class="block py-2 text-base font-medium text-gray-700 hover:text-luxuryGold">About</a>
-            <a href="#rooms" onclick="toggleMenu()" class="block py-2 text-base font-medium text-gray-700 hover:text-luxuryGold">Rooms</a>
-            <a href="#dining" onclick="toggleMenu()" class="block py-2 text-base font-medium text-gray-700 hover:text-luxuryGold">Dining</a>
-            <a href="#reviews" onclick="toggleMenu()" class="block py-2 text-base font-medium text-gray-700 hover:text-luxuryGold">Reviews</a>
-            <a href="#facilities" onclick="toggleMenu()" class="block py-2 text-base font-medium text-gray-700 hover:text-luxuryGold">Facilities</a>
-            <a href="#contact" onclick="toggleMenu()" class="block py-2 text-base font-medium text-gray-700 hover:text-luxuryGold">Contact</a>
-            <hr class="border-gray-100">
-            <div class="flex flex-col gap-3 pt-2">
-                <a href="https://instagram.com/pahadi.ghar" target="_blank" class="flex items-center gap-2 text-sm font-semibold border border-luxuryGold px-4 py-2 rounded-full text-luxuryText justify-center">
-                    <i class="fa-brands fa-instagram text-pink-600 text-lg"></i> Instagram
-                </a>
-                <a href="#rooms" onclick="toggleMenu()" class="bg-luxuryGold text-white text-center font-semibold text-sm px-5 py-2.5 rounded-full shadow-md">
-                    Book Now
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- ================= LIVE STATUS BAR ================= -->
-    <section class="bg-amber-50/70 border-b border-amber-200/50 py-3 px-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-sm">
-            <div class="flex items-center gap-2 font-medium text-gray-700">
-                <i class="fa-solid fa-calendar-check text-luxuryDarkGold animate-pulse"></i>
-                <span>Check Live Grid Availability</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <input type="date" id="liveCheckDate" onchange="updateLiveStatusDisplay()" class="bg-white border border-luxuryGold/30 text-xs rounded px-2 py-1 focus:outline-none">
-                <span id="liveStatusBadge" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded">Loading slots...</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= STATIC INFORMATION BANNER ================= -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white border border-luxuryGold/20 rounded-2xl p-4 shadow-sm text-center">
-            <div class="flex flex-col items-center justify-center p-2 border-r border-gray-100 last:border-none">
-                <i class="fa-solid fa-circle-info text-luxuryGold text-lg mb-1"></i>
-                <span class="text-xs text-gray-400 font-medium">Altitude</span>
-                <span class="text-xs font-bold text-luxuryText">11,020 Feet High</span>
-            </div>
-            <div class="flex flex-col items-center justify-center p-2 border-r border-gray-100 last:border-none">
-                <i class="fa-solid fa-snowflake text-luxuryGold text-lg mb-1"></i>
-                <span class="text-xs text-gray-400 font-medium">Climate</span>
-                <span class="text-xs font-bold text-luxuryText">Pleasant / Crisp Cold</span>
-            </div>
-            <div class="flex flex-col items-center justify-center p-2 border-r border-gray-100 last:border-none">
-                <i class="fa-solid fa-shield-halved text-luxuryGold text-lg mb-1"></i>
-                <span class="text-xs text-gray-400 font-medium">Stay Format</span>
-                <span class="text-xs font-bold text-luxuryText">100% Safe Local Homestay</span>
-            </div>
-            <div class="flex flex-col items-center justify-center p-2 last:border-none">
-                <i class="fa-solid fa-route text-luxuryGold text-lg mb-1"></i>
-                <span class="text-xs text-gray-400 font-medium">Connectivity</span>
-                <span class="text-xs font-bold text-luxuryText">Manali-Leh Highway</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= CHOOSE ACCOMMODATION ================= -->
-    <section id="rooms" class="max-w-md mx-auto px-4 py-12">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 pl-1">CHOOSE ACCOMMODATION</h3>
-
-        <div class="bg-white rounded-2xl p-4 border border-gray-200/60 shadow-md space-y-5">
-            
-            <!-- ROOM 101: FAMILY SUITE CARD -->
-            <div class="border border-gray-100 bg-white rounded-xl p-4 shadow-xs">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-800">Room 101: Family Suite</h4>
-                        <p class="text-xs text-gray-500">₹<span id="price_family">3099</span> / night</p>
-                    </div>
-                    <label class="relative inline-block w-12 h-7">
-                        <input type="checkbox" id="familySuiteToggle" onchange="handleFamilyToggleInteraction()" class="opacity-0 w-0 h-0">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="relative w-full h-44 rounded-xl overflow-hidden mt-2 bg-gray-100">
-                    <img src="https://i.ibb.co/99Ld3nYc/IMG-1601.jpg" class="w-full h-full object-cover" alt="Family Room">
-                    <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] uppercase tracking-wide font-semibold px-2 py-0.5 rounded">FAMILY SUITE VIEW</div>
-                </div>
-                <div class="mt-2 text-[11px] text-gray-500 space-y-0.5">
-                    <p><i class="fa-solid fa-users text-luxuryGold mr-1"></i> Best for 4-6 Persons | 2 Double Beds</p>
-                    <p><i class="fa-solid fa-circle-plus text-luxuryGold mr-1"></i> Extra Mattress &amp; Heater available on request</p>
-                </div>
-            </div>
-
-            <!-- COZY STANDARD ROOMS CARD -->
-            <div class="border border-gray-100 bg-white rounded-xl p-4 shadow-xs">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-800">Cozy Standard Rooms</h4>
-                        <p class="text-xs text-gray-500">Rooms 102 to 107</p>
-                        <p class="text-[11px] text-gray-400 font-medium">(₹<span id="price_standard">2099</span> / night)</p>
-                    </div>
-                    <!-- Counter Increment Engine -->
-                    <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-2 py-1 gap-3">
-                        <button onclick="changeStandardCount(-1)" class="text-lg font-bold text-gray-600 px-1 select-none focus:outline-none">−</button>
-                        <span id="standardRoomsCountDisplay" class="text-sm font-bold text-amber-600 min-w-[12px] text-center">0</span>
-                        <button onclick="changeStandardCount(1)" class="text-lg font-bold text-gray-600 px-1 select-none focus:outline-none">+</button>
-                    </div>
-                </div>
-                <div class="relative w-full h-44 rounded-xl overflow-hidden mt-2 bg-gray-100">
-                    <img src="https://i.ibb.co/ZRMycKTZ/IMG-1599.jpg" class="w-full h-full object-cover" alt="Standard Room">
-                    <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] uppercase tracking-wide font-semibold px-2 py-0.5 rounded">NORMAL ROOM VIEW</div>
-                </div>
-                <div class="mt-2 text-[11px] text-gray-500 space-y-0.5">
-                    <p><i class="fa-solid fa-users text-luxuryGold mr-1"></i> Best for 2-3 Persons | 1 Double Bed</p>
-                    <p><i class="fa-solid fa-circle-plus text-luxuryGold mr-1"></i> Extra Mattress &amp; Heater available on request</p>
-                </div>
-            </div>
-
-            <div id="bookingValidationError" class="hidden text-xs bg-red-50 text-red-700 p-2.5 rounded-xl font-semibold text-center"></div>
-
-            <button onclick="triggerReservationModalStep()" class="w-full bg-luxuryGold hover:bg-luxuryDarkGold text-white font-bold py-3 rounded-xl shadow transition-all tracking-wide text-xs uppercase">
-                Proceed To Booking 
-            </button>
-        </div>
-    </section>
-
-    <!-- ================= BOOKING MODAL ================= -->
-    <div id="bookingModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
-        <div class="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border p-6 relative">
-            <button onclick="closeBookingModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-lg focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="luxury-heading text-lg font-bold text-luxuryText mb-1">Verify Stay Itinerary</h3>
-            <p class="text-xs text-luxuryGold font-semibold mb-4">Complete simple details to securely dispatch via WhatsApp</p>
-            
-            <div id="modalValidationError" class="hidden mb-3 text-xs bg-red-50 text-red-700 p-2.5 rounded-xl font-semibold text-center"></div>
-
-            <form onsubmit="handleBookingSubmit(event)" class="space-y-3.5 text-xs font-medium">
-                <div>
-                    <label class="block text-gray-600 mb-1">Full Name *</label>
-                    <input type="text" id="guestName" required class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-luxuryGold focus:outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-gray-600 mb-1">Phone Number *</label>
-                        <input type="tel" id="guestPhone" required class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-luxuryGold focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-600 mb-1">Email ID (Optional)</label>
-                        <input type="email" id="guestEmail" class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-luxuryGold focus:outline-none">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-gray-600 mb-1">Coming From *</label>
-                        <select id="guestOrigin" required class="w-full border border-gray-200 rounded-lg p-2.5 text-xs bg-white focus:outline-none">
-                            <option value="Manali">Manali</option>
-                            <option value="Leh">Leh</option>
-                            <option value="Zanskar">Zanskar</option>
-                            <option value="Spiti">Spiti</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-600 mb-1">Address *</label>
-                        <input type="text" id="guestAddress" required class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-luxuryGold focus:outline-none">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-gray-600 mb-1">Check-in Date *</label>
-                        <input type="date" id="checkInDate" required onchange="calculateDuration()" class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-gray-600 mb-1">Check-out Date *</label>
-                        <input type="date" id="checkOutDate" required onchange="calculateDuration()" class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none">
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                    <div class="text-center flex flex-col justify-center">
-                        <span class="block text-[9px] uppercase text-gray-400">Total Nights</span>
-                        <span id="calculatedDays" class="text-xs font-bold text-luxuryText">1 Night</span>
-                    </div>
-                    <div>
-                        <label class="block text-[9px] text-gray-400 uppercase text-center mb-0.5">Adults</label>
-                        <select id="countAdults" class="w-full border border-gray-200 rounded bg-white p-1 text-center text-xs"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select>
-                    </div>
-                    <div>
-                        <label class="block text-[9px] text-gray-400 uppercase text-center mb-0.5">Children</label>
-                        <select id="countChildren" class="w-full border border-gray-200 rounded bg-white p-1 text-center text-xs"><option>0</option><option>1</option><option>2</option><option>3+</option></select>
-                    </div>
-                </div>
-
-                <div class="p-3 bg-amber-50 rounded-xl text-[11px] text-amber-800 space-y-0.5">
-                    <p class="font-bold">Summary Selection Stack:</p>
-                    <p id="formSummaryDisplayPanel">No selections matched.</p>
-                </div>
-
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold tracking-wide transition-all shadow-md">
-                    Submit Order Details via WhatsApp
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ================= ABOUT PROPERTY HOST SECTION ================= -->
-    <section id="about" class="bg-white py-20 border-y border-luxuryGold/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-5">
-                    <span class="text-xs uppercase font-extrabold tracking-widest text-luxuryGold block">Timeless High Altitude Hospitality</span>
-                    <h2 class="luxury-heading text-3xl sm:text-4xl font-bold tracking-tight text-luxuryText leading-tight">
-                        Meet Your Local Hosts:<br><span class="text-luxuryDarkGold">Chhering Tashi & Thinlay</span>
-                    </h2>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        Welcome to The Pahadi Ghar - Darcha. Nestled amidst the serene and majestic landscapes of the Lahaul Valley, The Pahadi Ghar is more than just a homestay—it’s a mountain experience. Surrounded by towering peaks and crisp, pristine skies, we offer the comfort of a home blended with authentic Himalayan hospitality. If you are looking to escape the daily hustle, breathe in the fresh mountain air, and unwind in nature's lap, welcome to your second home in the hills.
-                    </p>
-                    <div class="p-4 bg-luxuryLightBg rounded-2xl border-l-4 border-luxuryGold text-xs italic text-gray-600">
-                        "A place where there are no strangers, only friends you haven't met yet."
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="rounded-2xl overflow-hidden shadow h-64 border border-luxuryGold/20">
-                        <img src="https://i.ibb.co/gbxTfr0y/IMG-1603.jpg" alt="Landscape 1" class="w-full h-full object-cover">
-                    </div>
-                    <div class="rounded-2xl overflow-hidden shadow h-64 border border-luxuryGold/20 mt-6">
-                        <img src="https://i.ibb.co/Kjdy5bJg/IMG-20250609-154210736-Original.jpg" alt="Landscape 2" class="w-full h-full object-cover">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= DINE IN FOOD SECTION ================= -->
-    <section id="dining" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div class="text-center mb-12">
-            <span class="text-xs uppercase font-extrabold tracking-widest text-luxuryGold block">Organic Local Kitchen Culture</span>
-            <h2 class="luxury-heading text-3xl font-bold text-luxuryText mt-1">Traditional Indigenous Meals</h2>
-            <div class="w-16 h-0.5 bg-luxuryGold mx-auto mt-3"></div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-            <div class="space-y-4">
-                <h3 class="luxury-heading text-lg font-bold text-luxuryText">Native Organic Dining</h3>
-                <p class="text-xs text-gray-600 leading-relaxed">
-                    Savor high altitude warmth cooked carefully with premium organic grain inventories cultivated direct from mountain valley layers. We offer authentic culinary items loaded with absolute warmth and health properties.
-                </p>
-                <ul class="text-xs font-semibold text-luxuryDarkGold space-y-2">
-                    <li><i class="fa-solid fa-circle-check mr-1.5 text-[10px] text-emerald-600"></i> Local Lahauli Siddu with Pure Ghee</li>
-                    <li><i class="fa-solid fa-circle-check mr-1.5 text-[10px] text-emerald-600"></i> Mountain Thukpa & Steamed Veg Mokmoks</li>
-                    <li><i class="fa-solid fa-circle-check mr-1.5 text-[10px] text-emerald-600"></i> Traditional Butter Tea & Tsampa Porridge</li>
-                </ul>
-            </div>
-
-            <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div class="rounded-xl overflow-hidden h-44 bg-gray-100 shadow-xs"><img src="https://i.ibb.co/d4w3D4Fy/IMG-1392.jpg" class="w-full h-full object-cover" alt="Food 1"></div>
-                <div class="rounded-xl overflow-hidden h-44 bg-gray-100 shadow-xs"><img src="https://i.ibb.co/ynRYLkvH/IMG-1393.jpg" class="w-full h-full object-cover" alt="Food 2"></div>
-                <div class="rounded-xl overflow-hidden h-44 bg-gray-100 shadow-xs"><img src="https://i.ibb.co/Y4ZTSxzw/IMG-1389.jpg" class="w-full h-full object-cover" alt="Food 3"></div>
-                <div class="rounded-xl overflow-hidden h-44 bg-gray-100 shadow-xs"><img src="https://i.ibb.co/6JrmWSNF/IMG-1390.jpg" class="w-full h-full object-cover" alt="Food 4"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= GUEST REVIEWS SLIDER ================= -->
-    <section id="reviews" class="bg-gray-50 py-16 overflow-hidden border-t border-luxuryGold/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-8">
-            <h2 class="luxury-heading text-2xl font-bold text-luxuryText">Loved By 1000+ Happy Travellers</h2>
-            <div class="flex items-center justify-center gap-1 mt-2 text-amber-500 font-bold text-sm">
-                <i class="fa-solid fa-star"></i> 4.9 / 5 Verified Overall Guest Score
-            </div>
-        </div>
-
-        <div class="relative w-full flex overflow-x-hidden py-2">
-            <div id="reviewRow" class="flex space-x-6 whitespace-nowrap transition-transform duration-500 ease-in-out px-4">
-                <!-- Review cards injected dynamically -->
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= FACILITIES SECTION ================= -->
-    <section id="facilities" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div class="text-center mb-16">
-            <h2 class="luxury-heading text-3xl font-bold text-luxuryText">Amenities</h2>
-            <div class="w-16 h-0.5 bg-luxuryGold mx-auto mt-3"></div>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-xs font-bold uppercase tracking-wider text-luxuryText">
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-couch text-2xl text-luxuryGold mb-3"></i>
-                <h4>Cozy Stay</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-restroom text-2xl text-luxuryGold mb-3"></i>
-                <h4>Attached Washroom</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-               <i class="fa-solid fa-square-parking text-2xl text-luxuryGold mb-3"></i>
-                <h4>Safe Parking</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-kitchen-set text-2xl text-luxuryGold mb-3"></i>
-                <h4>Kitchen Access</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-fire-burner text-2xl text-luxuryGold mb-3"></i>
-                <h4>Room Heater</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-wifi text-2xl text-luxuryGold mb-3"></i>
-                <h4>Free WiFi</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-faucet-drip text-2xl text-luxuryGold mb-3"></i>
-                <h4>Hot Water</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-binoculars text-2xl text-luxuryGold mb-3"></i>
-                <h4>Window View</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-person-hiking text-2xl text-luxuryGold mb-3"></i>
-                <h4>Guided Tracks</h4>
-            </div>
-            <div class="p-6 bg-white border border-luxuryGold/10 rounded-2xl shadow-xs hover:scale-105 hover:border-luxuryGold transition-all">
-                <i class="fa-solid fa-campground text-2xl text-luxuryGold mb-3"></i>
-                <h4>Bonfire Nights</h4>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= MAP SECTION ================= -->
-    <section class="bg-white py-16 border-t border-luxuryGold/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="luxury-heading text-2xl font-bold text-luxuryText mb-1">Location & Route Coordinates</h2>
-            <p class="text-xs text-gray-500 mb-6 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-location-dot text-red-500"></i> Darcha Dangma, Lahaul & Spiti, Himachal Pradesh, India - 175132
-            </p>
-            <div class="w-full h-96 rounded-3xl overflow-hidden shadow-md border border-luxuryGold/20 mb-6">
-                <iframe class="w-full h-full border-0" src="https://maps.google.com/maps?q=Darcha%20Dangma,%20Himachal&t=&z=13&ie=UTF-8&iwloc=&output=embed" allowfullscreen></iframe>
-            </div>
-            <a href="https://maps.app.goo.gl/VjSTarWJenUzgJJQ9?g_st=ic" target="_blank" class="inline-flex items-center gap-2 bg-luxuryText text-white px-6 py-3 rounded-full font-bold text-xs tracking-wide shadow-md hover:bg-luxuryDarkGold transition-all">
-                <i class="fa-solid fa-map-location-dot"></i> Open Live Route Directions on Google Maps
-            </a>
-        </div>
-    </section>
-
-    <!-- ================= FOOTER ================= -->
-    <footer id="contact" class="bg-luxuryDarkBg text-gray-300 py-16 px-6 sm:px-8 border-t-2 border-luxuryGold/20">
-        <div class="max-w-4xl mx-auto space-y-12">
-            <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 rounded-full border border-luxuryGold/40 flex items-center justify-center bg-luxuryGold/10">
-                    <i class="fa-solid fa-mountain-sun text-luxuryGold text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="luxury-heading text-lg font-bold text-white tracking-widest">THE PAHADI GHAR</h3>
-                    <p class="text-xs text-luxuryGold tracking-widest uppercase">Darcha • Lahaul & Spiti</p>
-                </div>
-            </div>
-
-            <p class="text-sm text-gray-400 font-light max-w-xl leading-relaxed">
-                Your Home Above the Clouds. Authentic Lahauli hospitality at Darcha, Lahaul & Spiti, Himachal Pradesh.
-            </p>
-
-            <div class="flex items-center space-x-3">
-                <a href="https://instagram.com/pahadi.ghar" target="_blank" class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:border-luxuryGold text-gray-400 hover:text-luxuryGold transition-all">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
-                <a href="https://wa.me/917876631873" target="_blank" class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:border-luxuryGold text-gray-400 hover:text-luxuryGold transition-all">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </a>
-            </div>
-
-            <hr class="border-gray-800/60">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-xs uppercase font-extrabold tracking-widest text-luxuryGold mb-4">Quick Links</h4>
-                    <ul class="space-y-2.5 text-xs text-gray-400 font-medium">
-                        <li><a href="#about" class="hover:text-white transition-colors">About Homestay</a></li>
-                        <li><a href="#facilities" class="hover:text-white transition-colors">Amenities & Facilities</a></li>
-                        <li><a href="#rooms" class="hover:text-white transition-colors">Rooms & Tariffs</a></li>
-                        <li><a href="#dining" class="hover:text-white transition-colors">Organic Dining</a></li>
-                        <li><a href="#reviews" class="hover:text-white transition-colors">Guest Reviews</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="text-xs uppercase font-extrabold tracking-widest text-luxuryGold mb-4">Contact Hosts</h4>
-                    <p class="text-xs font-semibold text-gray-300 mb-3">Hosts: Chhering Tashi & Thinlay</p>
-                    <ul class="space-y-2 text-xs text-gray-400">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-luxuryGold text-xs"></i> +91 9418776308</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-luxuryGold text-xs"></i> +91 7876631873</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-luxuryGold text-xs"></i> pahadighar.darcha@gmail.com</li>
-                    </ul>
-                </div>
-            </div>
-
-            <hr class="border-gray-800/60">
-
-            <div class="space-y-2">
-                <h4 class="text-xs uppercase font-extrabold tracking-widest text-luxuryGold">Location & Social</h4>
-                <p class="text-xs text-gray-400 font-light leading-relaxed">
-                    Darcha Dangma, Lahaul & Spiti, Himachal Pradesh, India - 175132.
-                </p>
-                <p class="text-xs text-gray-400">
-                    Instagram: <a href="https://instagram.com/pahadi.ghar" target="_blank" class="text-luxuryGold hover:underline">@pahadi.ghar</a>
-                </p>
-            </div>
-
-            <div class="pt-6 text-center text-[10px] text-gray-600 tracking-wider uppercase font-medium">
-                © 2022 The Pahadi Ghar Darcha. All Rights Reserved.
-Designed by Thinleisss.
-            </div>
-        </div>
-    </footer>
-
-    <!-- ================= FAB CONTACT HUBS ================= -->
-    <div class="fixed bottom-6 right-6 z-50 fab-container flex flex-col items-end">
-        <div class="fab-options opacity-0 scale-95 pointer-events-none transition-all duration-300 flex flex-col space-y-2.5 mb-3 transform origin-bottom">
-            <a href="tel:+919418776308" class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white shadow-xl hover:scale-110 transition-transform">
-                <i class="fa-solid fa-phone"></i>
-            </a>
-            <a href="https://wa.me/917876631873" target="_blank" class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500 text-white shadow-xl hover:scale-110 transition-transform">
-                <i class="fa-brands fa-whatsapp text-xl"></i>
-            </a>
-        </div>
-        <button class="w-14 h-14 rounded-full bg-luxuryGold text-white flex items-center justify-center shadow-2xl hover:bg-luxuryDarkGold transition-all focus:outline-none">
-            <i class="fa-solid fa-comments text-lg"></i>
-        </button>
-    </div>
-
-    <!-- ================= ADMIN MODAL ================= -->
-    <div id="adminModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
-        <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-hidden shadow-2xl border flex flex-col">
-            <div class="bg-luxuryDarkBg p-4 flex items-center justify-between border-b border-luxuryGold/20">
-                <span class="luxury-heading text-sm font-bold text-white tracking-widest flex items-center gap-2">
-                    <i class="fa-solid fa-screwdriver-wrench text-luxuryGold"></i>Admin Dashboard Console 
-                </span>
-                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-xl focus:outline-none"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <!-- Login Section -->
-            <div id="adminAuthBlock" class="p-8 flex-grow flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto w-full">
-                <i class="fa-solid fa-fingerprint text-4xl text-luxuryGold mb-1"></i>
-                <h4 class="luxury-heading font-bold text-xs uppercase tracking-wide">Enter Admin Credentials</h4>
-                <div id="adminAuthError" class="hidden w-full text-center text-xs bg-red-50 text-red-700 p-2 rounded-lg font-bold"></div>
-                <input type="text" id="adminUser" placeholder="Username" class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none">
-                <input type="password" id="adminPass" placeholder="Password" class="w-full border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none">
-                <button onclick="processAdminLogin()" class="w-full bg-luxuryGold hover:bg-luxuryDarkGold text-white py-2.5 rounded-lg font-bold text-xs uppercase transition-all">Login</button>
-            </div>
-
-            <!-- Dashboard Workspace Section -->
-            <div id="adminPanelWorkspace" class="hidden flex-grow overflow-y-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-gray-50">
-                
-                <!-- Left Control Box -->
-                <div class="lg:col-span-5 bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-4 text-xs font-medium">
-                    
-                    <div id="adminWorkspaceStatus" class="hidden text-xs font-bold p-3 rounded-xl text-center"></div>
-
-                    <h4 class="text-sm font-bold border-b pb-2 text-gray-800 flex items-center gap-1"><i class="fa-solid fa-calendar-minus text-amber-600"></i> Date Locking Operations</h4>
-                    <div>
-                        <label class="block text-gray-600 mb-1">Select Target Room Inventory Cells</label>
-                        <div class="grid grid-cols-3 gap-1.5" id="adminRoomSelectionList"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-gray-600 mb-1">Lock From Date</label>
-                            <input type="date" id="lockInDate" class="w-full border border-gray-200 p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 mb-1">Lock To Date</label>
-                            <input type="date" id="lockOutDate" class="w-full border border-gray-200 p-2 rounded text-xs">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-gray-600 mb-1">Guest Reference Notes</label>
-                        <textarea id="lockGuestDetails" rows="2" placeholder="Guest Name, metadata log items..." class="w-full border border-gray-200 p-2 rounded text-xs focus:outline-none"></textarea>
-                    </div>
-                    <button onclick="saveAdminLockBlock()" class="w-full bg-luxuryText text-white py-2.5 rounded-lg font-bold transition-all hover:bg-luxuryDarkGold">
-                        Execute Calendar Lock Vector
-                    </button>
-
-                    <hr class="my-3">
-
-                    <h4 class="text-sm font-bold border-b pb-2 text-gray-800 flex items-center gap-1"><i class="fa-solid fa-tags text-luxuryGold"></i> Base Rates Override Tool</h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-gray-600 mb-1">Family Price (₹)</label>
-                            <input type="number" id="inputPriceFamily" class="w-full border border-gray-200 p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 mb-1">Standard Price (₹)</label>
-                            <input type="number" id="inputPriceStandard" class="w-full border border-gray-200 p-2 rounded text-xs">
-                        </div>
-                    </div>
-                    <button onclick="saveAdminRates()" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold transition-all hover:bg-emerald-700">
-                        Commit Pricing Override Updates
-                    </button>
-                </div>
-
-                <!-- Right Display Grid/Registry Box -->
-                <div class="lg:col-span-7 space-y-4">
-                    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
-                        <h4 class="text-sm font-bold border-b pb-2 text-gray-800 flex items-center gap-1 mb-2"><i class="fa-solid fa-list-check text-indigo-600"></i> Active Locked Blocks Registry</h4>
-                        <div class="overflow-x-auto max-h-[35vh] overflow-y-auto border border-gray-100 rounded-lg" id="adminBookingsRegisterBox"></div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-2 mb-2">
-                            <h4 class="text-sm font-bold text-gray-800 flex items-center gap-1"><i class="fa-solid fa-table-cells text-teal-600"></i> Dynamic 30-Day Matrix Monitor</h4>
-                            <input type="month" id="calendarMatrixMonthSelector" onchange="renderMatrixCalendar()" class="border p-1 text-xs rounded bg-white focus:outline-none">
-                        </div>
-                        <div class="overflow-x-auto max-h-[25vh] overflow-y-auto">
-                            <table class="w-full text-left text-[11px] border-collapse">
-                                <thead><tr class="bg-gray-100 border-b text-gray-600" id="matrixHeadRow"></tr></thead>
-                                <tbody id="matrixBodyRows" class="divide-y text-gray-700"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= JAVASCRIPT ENGINE ================= -->
-    <script>
-        let state = {
-            bookings: [], 
-            prices: { family: 3099, standard: 2099 } 
-        };
-
-        let selections = {
-            familySelected: false,
-            standardCount: 0
-        };
-
-        function showAdminStatus(message, isError) {
-            const container = document.getElementById('adminWorkspaceStatus');
-            if(!container) return;
-            container.innerText = message;
-            container.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-emerald-50', 'text-emerald-700');
-            
-            if(isError) {
-                container.classList.add('bg-red-50', 'text-red-700');
-            } else {
-                container.classList.add('bg-emerald-50', 'text-emerald-700');
-            }
-            setTimeout(() => { container.classList.add('hidden'); }, 4000);
-        }
-
-        async function loadStorageState() {
-            try {
-                if (window.db) {
-                    const dbRefPath = window.dbRef(window.db, 'pahadi_ghar_data');
-                    const snapshot = await window.dbGet(dbRefPath);
-                    if (snapshot.exists()) {
-                        state = snapshot.val();
-                        if(!state.bookings) state.bookings = [];
-                        if(!state.prices) state.prices = { family: 3099, standard: 2099 };
-                    } else {
-                        state.bookings = [
-                            { id: "seed-1", roomNum: 101, checkIn: "2026-07-25", checkOut: "2026-07-28", guestMeta: "Amit (Manali) - Sample Log Entry" }
-                        ];
-                        await saveStorageState();
-                    }
-                } else {
-                    const localData = localStorage.getItem('THE_PAHADI_GHAR_SECURE_STATE');
-                    if(localData) {
-                        state = JSON.parse(localData);
-                    } else {
-                        state.bookings = [
-                            { id: "seed-1", roomNum: 101, checkIn: "2026-07-25", checkOut: "2026-07-28", guestMeta: "Amit (Manali) - Sample Log Entry" }
-                        ];
-                        await saveStorageState();
-                    }
-                }
-            } catch(e) { 
-                console.error("Firebase Sync Error, falling back to local storage", e); 
-            }
-            syncUIRates();
-            updateLiveStatusDisplay();
-        }
-
-        async function saveStorageState() {
-            try {
-                if (window.db) {
-                    const dbRefPath = window.dbRef(window.db, 'pahadi_ghar_data');
-                    await window.dbSet(dbRefPath, state);
-                }
-            } catch(e) {
-                console.error("Firebase Save Error", e);
-            }
-            localStorage.setItem('THE_PAHADI_GHAR_SECURE_STATE', JSON.stringify(state));
-        }
-
-        function syncUIRates() {
-            document.getElementById('price_family').innerText = state.prices.family;
-            document.getElementById('price_standard').innerText = state.prices.standard;
-            document.getElementById('inputPriceFamily').value = state.prices.family;
-            document.getElementById('inputPriceStandard').value = state.prices.standard;
-        }
-
-        function handleFamilyToggleInteraction() {
-            selections.familySelected = document.getElementById('familySuiteToggle').checked;
-        }
-
-        function changeStandardCount(amount) {
-            let nextVal = selections.standardCount + amount;
-            if (nextVal >= 0 && nextVal <= 6) { 
-                selections.standardCount = nextVal;
-                document.getElementById('standardRoomsCountDisplay').innerText = selections.standardCount;
-            }
-        }
-
-        function dateRangeOverlaps(a_start, a_end, b_start, b_end) {
-            return new Date(a_start) < new Date(b_end) && new Date(b_start) < new Date(a_end);
-        }
-
-        function verifyRoomAvailability(roomNum, checkIn, checkOut) {
-            for(let block of state.bookings) {
-                if(Number(block.roomNum) === Number(roomNum)) {
-                    if(dateRangeOverlaps(block.checkIn, block.checkOut, checkIn, checkOut)) return false;
-                }
-            }
-            return true;
-        }
-
-        function triggerReservationModalStep() {
-            const errBox = document.getElementById('bookingValidationError');
-            errBox.classList.add('hidden');
-
-            if(!selections.familySelected && selections.standardCount === 0) {
-                errBox.innerText = "Please turn ON the Family Suite toggle or select standard rooms first.";
-                errBox.classList.remove('hidden');
-                return;
-            }
-            
-            document.getElementById('checkInDate').value = "2026-07-25";
-            document.getElementById('checkOutDate').value = "2026-07-26";
-            calculateDuration();
-
-            let summaryText = "";
-            if(selections.familySelected) summaryText += `• Room 101 Family Suite Allocation Active\n`;
-            if(selections.standardCount > 0) summaryText += `• ${selections.standardCount} Cozy Standard Room Module Units Requested`;
-            document.getElementById('formSummaryDisplayPanel').innerText = summaryText;
-
-            document.getElementById('modalValidationError').classList.add('hidden');
-            document.getElementById('bookingModal').classList.remove('hidden');
-        }
-
-        function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); }
-        function toggleMenu() { document.getElementById('mobileDrawer').classList.toggle('hidden'); }
-        document.getElementById('mobileMenuBtn').addEventListener('click', toggleMenu);
-
-        function calculateDuration() {
-            const ci = document.getElementById('checkInDate').value;
-            const co = document.getElementById('checkOutDate').value;
-            if(ci && co) {
-                const diffTime = Math.abs(new Date(co) - new Date(ci));
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                document.getElementById('calculatedDays').innerText = `${diffDays} Night${diffDays > 1 ? 's':''}`;
-            }
-        }
-
-        function handleBookingSubmit(event) {
-            event.preventDefault();
-            const checkIn = document.getElementById('checkInDate').value;
-            const checkOut = document.getElementById('checkOutDate').value;
-            const modalErr = document.getElementById('modalValidationError');
-            modalErr.classList.add('hidden');
-
-            if(selections.familySelected) {
-                if(!verifyRoomAvailability(101, checkIn, checkOut)) {
-                    modalErr.innerText = "Room 101 Family Suite is already reserved inside this date path.";
-                    modalErr.classList.remove('hidden');
-                    return;
-                }
-            }
-
-            let allocationStandardRoomsArray = [];
-            if(selections.standardCount > 0) {
-                for(let r = 102; r <= 107; r++) {
-                    if(verifyRoomAvailability(r, checkIn, checkOut)) {
-                        allocationStandardRoomsArray.push(r);
-                        if(allocationStandardRoomsArray.length === selections.standardCount) break;
-                    }
-                }
-                if(allocationStandardRoomsArray.length < selections.standardCount) {
-                    modalErr.innerText = `Only ${allocationStandardRoomsArray.length} Standard room(s) left vacant for these dates.`;
-                    modalErr.classList.remove('hidden');
-                    return;
-                }
-            }
-
-            const name = document.getElementById('guestName').value;
-            const phone = document.getElementById('guestPhone').value;
-            const email = document.getElementById('guestEmail').value || 'N/A';
-            const origin = document.getElementById('guestOrigin').value;
-            const address = document.getElementById('guestAddress').value;
-            const adults = document.getElementById('countAdults').value;
-            const children = document.getElementById('countChildren').value;
-            const duration = document.getElementById('calculatedDays').innerText;
-
-            const textTemplate = `*The Pahadi Ghar - Darcha | New Booking Request*\n` +
-                                 `*👤 Guest information:* \n` +
-                                 `Guest Name: ${name}\n` +
-                                 `Contact Phone: ${phone}\n` +
-                                 `Email Reference: ${email}\n` +
-                                 `Home Residence Address: ${address}\n` +
-                                 `Coming From: ${origin}\n` +
-                                 `*📆 Stay Details:* \n` +
-                                 `${selections.familySelected ? '-> Room 101 Family Suite Active\n' : ''}` +
-                                 `${selections.standardCount > 0 ? '-> ' + selections.standardCount + ' Standard Room Units (Allocated: ' + allocationStandardRoomsArray.join(', ') + ')\n' : ''}` +
-                                 `Check-In Date: ${checkIn}\n` +
-                                 `Check-Out Date: ${checkOut}\n` +
-                                 `Duration Scope: ${duration}\n` +
-                                 `Guest Headcount: ${adults} Adults, ${children} Children\n` +
-                                 `Please confirm availability and let us know what to do next.`;
-
-            window.open(`https://api.whatsapp.com/send?phone=917876631873&text=${encodeURIComponent(textTemplate)}`, '_blank');
-            closeBookingModal();
-        }
-
-        function updateLiveStatusDisplay() {
-            const selectedDate = document.getElementById('liveCheckDate').value;
-            if(!selectedDate) return;
-
-            let bookedCounter = 0;
-            let familyRoomBooked = false;
-
-            for(let b of state.bookings) {
-                if(dateRangeOverlaps(b.checkIn, b.checkOut, selectedDate, selectedDate)) {
-                    bookedCounter++;
-                    if(Number(b.roomNum) === 101) familyRoomBooked = true;
-                }
-            }
-
-            const badge = document.getElementById('liveStatusBadge');
-            if(bookedCounter >= 7) {
-                badge.className = "bg-red-100 text-red-800 text-xs font-bold px-2.5 py-1 rounded";
-                badge.innerText = "ALL UNITS FULL";
-            } else {
-                badge.className = "bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded";
-                badge.innerText = `${6 - (bookedCounter - (familyRoomBooked ? 1 : 0))} Standard Free | Family: ${familyRoomBooked ? 'Locked':'Vacant'}`;
-            }
-        }
-
-        function openAdminModal() {
-            document.getElementById('adminModal').classList.remove('hidden');
-            document.getElementById('adminAuthBlock').classList.remove('hidden');
-            document.getElementById('adminPanelWorkspace').classList.add('hidden');
-            document.getElementById('adminAuthError').classList.add('hidden');
-        }
-        function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
-
-        function processAdminLogin() {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
-            const loginErr = document.getElementById('adminAuthError');
-
-            if(user === 'pahadi.ghar' && pass === '123890') {
-                loginErr.classList.add('hidden');
-                document.getElementById('adminAuthBlock').classList.add('hidden');
-                document.getElementById('adminPanelWorkspace').classList.remove('hidden');
-                
-                document.getElementById('calendarMatrixMonthSelector').value = "2026-07";
-                document.getElementById('lockInDate').value = "2026-07-25";
-                document.getElementById('lockOutDate').value = "2026-07-26";
-                
-                renderAdminRoomCheckboxes();
-                renderBookingsRegisterList();
-                renderMatrixCalendar();
-                showAdminStatus("Welcome Back! Firebase & Matrix Connected Successfully.", false);
-            } else { 
-                loginErr.innerText = "Invalid Operational Security Keys!";
-                loginErr.classList.remove('hidden');
-            }
-        }
-
-        function renderAdminRoomCheckboxes() {
-            const box = document.getElementById('adminRoomSelectionList');
-            box.innerHTML = `<label class="flex items-center gap-1 bg-amber-50 p-1.5 rounded border cursor-pointer"><input type="checkbox" name="adminRooms" value="101"> 101(F)</label>`;
-            for(let r = 102; r <= 107; r++) {
-                box.innerHTML += `<label class="flex items-center gap-1 bg-gray-50 p-1.5 rounded border cursor-pointer"><input type="checkbox" name="adminRooms" value="${r}"> ${r}(S)</label>`;
-            }
-        }
-
-        function renderBookingsRegisterList() {
-            const container = document.getElementById('adminBookingsRegisterBox');
-            if(!state.bookings || state.bookings.length === 0) {
-                container.innerHTML = `<p class="text-xs italic text-gray-400 p-3">No active lock entries captured inside registry.</p>`;
-                return;
-            }
-            let html = `<table class="w-full text-left text-xs divide-y divide-gray-200 min-w-[320px]">
-                            <thead class="bg-gray-100 font-bold sticky top-0">
-                                <tr>
-                                    <th class="p-2.5">Room</th>
-                                    <th class="p-2.5">Dates Scope</th>
-                                    <th class="p-2.5">Guest Memo / Name</th>
-                                    <th class="p-2.5 text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 font-normal">`;
-            
-            state.bookings.forEach(b => {
-                html += `<tr class="hover:bg-gray-50">
-                            <td class="p-2.5 font-bold text-gray-700 whitespace-nowrap">${b.roomNum}</td>
-                            <td class="p-2.5 text-[11px] text-gray-600 whitespace-nowrap">${b.checkIn}<br>to ${b.checkOut}</td>
-                            <td class="p-2.5 text-gray-700 break-words min-w-[140px]">${b.guestMeta}</td>
-                            <td class="p-2.5 text-center whitespace-nowrap">
-                                <button onclick="deleteBookingBlock('${b.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all">
-                                    <i class="fa-solid fa-trash-can mr-1"></i> Clear
-                                </button>
-                            </td>
-                         </tr>`;
-            });
-            container.innerHTML = html + `</tbody></table>`;
-        }
-
-        async function saveAdminLockBlock() {
-            const checkIn = document.getElementById('lockInDate').value;
-            const checkOut = document.getElementById('lockOutDate').value;
-            const meta = document.getElementById('lockGuestDetails').value || "Manual Blockout";
-
-            if(!checkIn || !checkOut) { 
-                showAdminStatus("Error: Missing target lock dates!", true); 
-                return; 
-            }
-
-            if(new Date(checkIn) >= new Date(checkOut)) {
-                showAdminStatus("Error: Check-out must be after Check-in!", true);
-                return;
-            }
-
-            let targetedRooms = [];
-            document.getElementsByName('adminRooms').forEach(cb => { if(cb.checked) targetedRooms.push(Number(cb.value)); });
-            if(targetedRooms.length === 0) { 
-                showAdminStatus("Error: Pick at least one target room cell!", true); 
-                return; 
-            }
-
-            for(let roomNum of targetedRooms) {
-                if(!verifyRoomAvailability(roomNum, checkIn, checkOut)) {
-                    showAdminStatus(`Conflict Error: Room ${roomNum} is already blocked on these dates.`, true);
-                    return;
-                }
-            }
-
-            targetedRooms.forEach(room => {
-                state.bookings.push({
-                    id: 'lock-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-                    roomNum: room, 
-                    checkIn: checkIn, 
-                    checkOut: checkOut, 
-                    guestMeta: meta
+        // Global Data Arrays synced with Firebase
+        window.bookings = [];
+        window.guests = [];
+        const roomsList = ["101", "102", "103", "104", "105", "106", "107"];
+
+        // Realtime Listeners for Bookings and Guests
+        onValue(ref(db, 'pahadi_bookings'), (snapshot) => {
+            const data = snapshot.val();
+            window.bookings = [];
+            if (data) {
+                Object.keys(data).forEach(firebaseKey => {
+                    window.bookings.push({ firebaseKey, ...data[firebaseKey] });
                 });
-            });
+            }
+            if(typeof renderBookings === 'function') renderBookings();
+            if(typeof renderCalendar === 'function') renderCalendar();
+        });
 
-            await saveStorageState();
-            renderBookingsRegisterList();
-            renderMatrixCalendar();
-            updateLiveStatusDisplay();
+        onValue(ref(db, 'pahadi_guests'), (snapshot) => {
+            const data = snapshot.val();
+            window.guests = [];
+            if (data) {
+                Object.keys(data).forEach(firebaseKey => {
+                    window.guests.push({ firebaseKey, ...data[firebaseKey] });
+                });
+            }
+            if(typeof renderGuests === 'function') renderGuests();
+        });
+
+        // Expose Firebase DB actions globally to interact with HTML inline handlers
+        window.fbSaveBooking = (bookingData) => {
+            const newRef = push(ref(db, 'pahadi_bookings'));
+            return set(newRef, bookingData);
+        };
+
+        window.fbDeleteBooking = (firebaseKey) => {
+            return remove(ref(db, 'pahadi_bookings/' + firebaseKey));
+        };
+
+        window.fbSaveGuest = (guestData) => {
+            const newRef = push(ref(db, 'pahadi_guests'));
+            return set(newRef, guestData);
+        };
+
+        window.fbDeleteGuest = (firebaseKey) => {
+            return remove(ref(db, 'pahadi_guests/' + firebaseKey));
+        };
+    </script>
+
+    <!-- Main Logic Script -->
+    <script>
+        // Initialization
+        window.onload = () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('b-cin').value = today;
+            document.getElementById('g-cin').value = today;
+            document.getElementById('cal-start-date').value = today;
+        };
+
+        // --- AUTHENTICATION ---
+        function login() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            if(u === 'pahadi.ghar' && p === '123890') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                if(typeof renderCalendar === 'function') renderCalendar(); 
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        // --- UI TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
             
-            document.getElementById('lockGuestDetails').value = "";
-            document.getElementsByName('adminRooms').forEach(cb => cb.checked = false);
-
-            showAdminStatus("Success: Selected dates locked & synced to Firebase!", false);
+            if(tabId === 'booking-tab') document.getElementById('btn-booking-tab').classList.add('active');
+            if(tabId === 'guest-tab') document.getElementById('btn-guest-tab').classList.add('active');
+            if(tabId === 'calendar-tab') {
+                document.getElementById('btn-calendar-tab').classList.add('active');
+                renderCalendar();
+            }
         }
 
-        async function deleteBookingBlock(id) {
-            state.bookings = state.bookings.filter(b => b.id !== id);
-            await saveStorageState();
-            renderBookingsRegisterList();
-            renderMatrixCalendar();
-            updateLiveStatusDisplay();
-            showAdminStatus("Success: Room unlocked and entry removed from Firebase.", false);
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
 
-        async function saveAdminRates() {
-            state.prices.family = Number(document.getElementById('inputPriceFamily').value);
-            state.prices.standard = Number(document.getElementById('inputPriceStandard').value);
-            await saveStorageState();
-            syncUIRates();
-            showAdminStatus("Success: Base tariff structures overridden in Firebase.", false);
+        // --- HELPERS ---
+        function getSelectedCheckboxes(containerId) {
+            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
+            let values = [];
+            checkboxes.forEach(cb => values.push(cb.value));
+            return values;
         }
 
-        function renderMatrixCalendar() {
-            const yearMonthStr = document.getElementById('calendarMatrixMonthSelector').value;
-            if(!yearMonthStr) return;
-            const [year, month] = yearMonthStr.split('-').map(Number);
-            const totalDays = new Date(year, month, 0).getDate();
+        function clearCheckboxes(containerId) {
+            document.querySelectorAll(`#${containerId} input[type="checkbox"]`).forEach(cb => cb.checked = false);
+        }
 
-            const headRow = document.getElementById('matrixHeadRow');
-            headRow.innerHTML = `<th class="p-1 border-r bg-gray-200 text-center">Room</th>`;
-            for(let d = 1; d <= totalDays; d++) { headRow.innerHTML += `<th class="p-0.5 text-center text-[9px] w-5">${d}</th>`; }
+        function calcDuration(cinId, coutId, outputId) {
+            const cin = document.getElementById(cinId).value;
+            const cout = document.getElementById(coutId).value;
+            if(cin && cout) {
+                const diffTime = new Date(cout) - new Date(cin);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                document.getElementById(outputId).value = diffDays > 0 ? diffDays : 0;
+            }
+        }
+        function calcDurationB() { calcDuration('b-cin', 'b-cout', 'b-duration'); }
+        function calcDurationG() { calcDuration('g-cin', 'g-cout', 'g-duration'); }
 
-            const bodyRows = document.getElementById('matrixBodyRows');
-            bodyRows.innerHTML = '';
-            let roomsArray = [101, 102, 103, 104, 105, 106, 107];
+        function countRoomsB() { document.getElementById('b-room-count').value = getSelectedCheckboxes('b-rooms-container').length; }
+        function countRoomsG() { document.getElementById('g-room-count').value = getSelectedCheckboxes('g-rooms-container').length; }
 
-            roomsArray.forEach(room => {
-                let rowHtml = `<tr><td class="p-1 font-bold border-r bg-white text-center">${room}</td>`;
-                for(let d = 1; d <= totalDays; d++) {
-                    let padDay = d < 10 ? '0' + d : '' + d;
-                    let cellDate = `${year}-${month < 10 ? '0'+month : month}-${padDay}`;
-                    let cellOccupied = false;
+        function calcPayment() {
+            const total = parseFloat(document.getElementById('b-total').value) || 0;
+            const advance = parseFloat(document.getElementById('b-advance').value) || 0;
+            document.getElementById('b-balance').value = total - advance;
+        }
 
-                    for(let b of state.bookings) {
-                        if(Number(b.roomNum) === room) {
-                            if(new Date(cellDate) >= new Date(b.checkIn) && new Date(cellDate) < new Date(b.checkOut)) { cellOccupied = true; break; }
+        // --- DELETE CONFIRMATION LOGIC ---
+        let deleteTargetKey = null;
+        let deleteTargetType = null; // 'booking' or 'guest'
+
+        function requestDelete(firebaseKey, type) {
+            deleteTargetKey = firebaseKey;
+            deleteTargetType = type;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+            if(deleteTargetType === 'booking') {
+                window.fbDeleteBooking(deleteTargetKey).then(() => {
+                    closeModal('delete-modal');
+                });
+            } else if (deleteTargetType === 'guest') {
+                window.fbDeleteGuest(deleteTargetKey).then(() => {
+                    closeModal('delete-modal');
+                });
+            }
+        });
+
+        // --- BOOKING LOGIC ---
+        function checkClash(cin, cout, selectedRooms, excludeKey = null) {
+            const newStart = new Date(cin);
+            const newEnd = new Date(cout);
+
+            for (let b of window.bookings) {
+                if (excludeKey && b.firebaseKey === excludeKey) continue;
+                
+                const bStart = new Date(b.cin);
+                const bEnd = new Date(b.cout);
+
+                if (newStart < bEnd && newEnd > bStart) {
+                    const clashingRooms = selectedRooms.filter(r => b.rooms.includes(r));
+                    if (clashingRooms.length > 0) {
+                        return { clash: true, room: clashingRooms.join(', '), booking: b };
+                    }
+                }
+            }
+            return { clash: false };
+        }
+
+        function submitBooking() {
+            const name = document.getElementById('b-name').value;
+            const phone = document.getElementById('b-phone').value;
+            const cin = document.getElementById('b-cin').value;
+            const cout = document.getElementById('b-cout').value;
+            const duration = document.getElementById('b-duration').value;
+            const rooms = getSelectedCheckboxes('b-rooms-container');
+            const meal = document.getElementById('b-meal').value;
+            const total = document.getElementById('b-total').value;
+            const advance = document.getElementById('b-advance').value;
+            const balance = document.getElementById('b-balance').value;
+
+            if(!name || !cin || !cout || rooms.length === 0) {
+                alert("Please fill name, dates, and select at least one room.");
+                return;
+            }
+            if(new Date(cin) >= new Date(cout)) {
+                alert("Check-out date must be after Check-in date.");
+                return;
+            }
+
+            const clashResult = checkClash(cin, cout, rooms);
+            if (clashResult.clash) {
+                const b = clashResult.booking;
+                document.getElementById('clash-message').innerHTML = `
+                    <strong>Room(s):</strong> <span style="color:var(--danger)">${clashResult.room}</span> are already booked!<br><br>
+                    <strong>Previous Booking Details:</strong><br>
+                    Name: ${b.name}<br>
+                    Dates: ${b.cin} to ${b.cout}<br>
+                    Phone: ${b.phone}
+                `;
+                document.getElementById('clash-modal').style.display = 'flex';
+                return;
+            }
+
+            const booking = {
+                id: Date.now(), name, phone, cin, cout, duration, rooms, meal, total, advance, balance,
+                timestamp: new Date().toISOString()
+            };
+
+            window.fbSaveBooking(booking).then(() => {
+                document.getElementById('b-name').value = '';
+                document.getElementById('b-phone').value = '';
+                clearCheckboxes('b-rooms-container');
+                countRoomsB();
+                document.getElementById('b-total').value = '';
+                document.getElementById('b-advance').value = '';
+                document.getElementById('b-balance').value = '';
+                alert("Booking Saved Successfully to Firebase!");
+            }).catch((error) => {
+                alert("Error saving booking: " + error.message);
+            });
+        }
+
+        function renderBookings() {
+            const tbody = document.querySelector('#booking-table tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let searchDate = document.getElementById('b-search-date').value;
+            let sorted = [...window.bookings].sort((a, b) => new Date(a.cin) - new Date(b.cin));
+            
+            if(searchDate) {
+                const sDate = new Date(searchDate);
+                sorted = sorted.filter(b => {
+                    return sDate >= new Date(b.cin) && sDate < new Date(b.cout);
+                });
+            }
+
+            sorted.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${b.cin}</td>
+                    <td>${b.cout}</td>
+                    <td><strong>${b.name}</strong></td>
+                    <td>${b.phone}</td>
+                    <td>${b.rooms ? b.rooms.join(', ') : ''}</td>
+                    <td>${b.meal}</td>
+                    <td>₹${b.total}</td>
+                    <td style="color:var(--danger); font-weight:600;">₹${b.balance}</td>
+                    <td>
+                        <button class="action-btn btn-pdf" onclick="downloadPDF('${b.firebaseKey}')">PDF</button>
+                        <button class="action-btn btn-delete" onclick="requestDelete('${b.firebaseKey}', 'booking')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- GUEST LOGIC ---
+        function submitGuest() {
+            const name = document.getElementById('g-name').value;
+            if(!name) { alert("Guest name is required"); return; }
+
+            const guest = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleDateString(),
+                name: name,
+                phone: document.getElementById('g-phone').value,
+                address: document.getElementById('g-address').value,
+                idNum: document.getElementById('g-id').value,
+                vehicle: document.getElementById('g-vehicle').value,
+                coming: document.getElementById('g-coming').value,
+                going: document.getElementById('g-going').value,
+                cin: document.getElementById('g-cin').value,
+                cout: document.getElementById('g-cout').value,
+                duration: document.getElementById('g-duration').value,
+                rooms: getSelectedCheckboxes('g-rooms-container'),
+                male: document.getElementById('g-male').value,
+                female: document.getElementById('g-female').value,
+                child: document.getElementById('g-child').value,
+                remarks: document.getElementById('g-remarks').value
+            };
+
+            window.fbSaveGuest(guest).then(() => {
+                document.getElementById('g-name').value = '';
+                document.getElementById('g-phone').value = '';
+                document.getElementById('g-address').value = '';
+                document.getElementById('g-id').value = '';
+                document.getElementById('g-vehicle').value = '';
+                document.getElementById('g-coming').value = '';
+                document.getElementById('g-going').value = '';
+                document.getElementById('g-remarks').value = '';
+                clearCheckboxes('g-rooms-container');
+                countRoomsG();
+                alert("Guest Details Saved Successfully to Firebase!");
+            }).catch((error) => {
+                alert("Error saving guest: " + error.message);
+            });
+        }
+
+        function renderGuests() {
+            const tbody = document.querySelector('#guest-table tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let sorted = [...window.guests].sort((a, b) => b.id - a.id);
+
+            sorted.forEach(g => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${g.timestamp}</td>
+                    <td><strong>${g.name}</strong><br><small style="color:var(--text-muted)">${g.address}</small></td>
+                    <td>${g.phone}</td>
+                    <td>${g.idNum}</td>
+                    <td>${g.vehicle}</td>
+                    <td>${g.coming} <br> <small>to</small> <br> ${g.going}</td>
+                    <td>${g.rooms ? g.rooms.join(', ') : ''}<br><small>${g.duration} Days</small></td>
+                    <td>
+                         <button class="action-btn btn-pdf" onclick="downloadGuestPDF('${g.firebaseKey}')">PDF</button>
+                         <button class="action-btn btn-delete" onclick="requestDelete('${g.firebaseKey}', 'guest')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- CALENDAR LOGIC ---
+        function renderCalendar() {
+            const matrix = document.getElementById('calendar-matrix');
+            if(!matrix) return;
+            matrix.innerHTML = '';
+            
+            let startDateStr = document.getElementById('cal-start-date').value;
+            if(!startDateStr) startDateStr = new Date().toISOString().split('T')[0];
+            
+            const start = new Date(startDateStr);
+            const daysToDisplay = 14;
+
+            matrix.style.gridTemplateColumns = `120px repeat(${daysToDisplay}, minmax(100px, 1fr))`;
+            
+            let headerHtml = `<div class="cal-header" style="background:var(--bg-color);">Room \\ Date</div>`;
+            let dates = [];
+            
+            for(let i=0; i<daysToDisplay; i++) {
+                let d = new Date(start);
+                d.setDate(d.getDate() + i);
+                dates.push(d);
+                let dateStr = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                headerHtml += `<div class="cal-header">${dateStr}</div>`;
+            }
+            matrix.innerHTML += headerHtml;
+
+            const roomsList = ["101", "102", "103", "104", "105", "106", "107"];
+            roomsList.forEach(room => {
+                let rowHtml = `<div class="cal-room">Room ${room}</div>`;
+                
+                dates.forEach(date => {
+                    let statusClass = 'status-free';
+                    let cellText = 'Available';
+                    
+                    for(let b of window.bookings) {
+                        if(b.rooms && b.rooms.includes(room)) {
+                            let bCin = new Date(b.cin);
+                            let bCout = new Date(b.cout);
+                            
+                            bCin.setHours(0,0,0,0);
+                            bCout.setHours(0,0,0,0);
+                            let currentDay = new Date(date);
+                            currentDay.setHours(0,0,0,0);
+
+                            if(currentDay >= bCin && currentDay < bCout) {
+                                statusClass = 'status-booked';
+                                cellText = b.name.split(' ')[0];
+                                break;
+                            }
                         }
                     }
-                    rowHtml += `<td class="p-0 text-center"><div class="py-1 text-[9px] font-bold select-none ${cellOccupied ? 'bg-red-500 text-white':'bg-emerald-50 text-emerald-700'}">${cellOccupied ? 'L':'-'}</div></td>`;
-                }
-                bodyRows.innerHTML += rowHtml + `</tr>`;
+                    rowHtml += `<div class="cal-cell ${statusClass}">${cellText}</div>`;
+                });
+                matrix.innerHTML += rowHtml;
             });
         }
 
-        function seedReviewsSliderMatrixEngine() {
-            const targetTrack = document.getElementById('reviewRow');
-            const locations = ['Delhi', 'Chandigarh', 'Mumbai', 'Manali', 'Leh'];
-            const travelers = ['Amit Sharma', 'Priya Patel', 'Rohan Verma', 'Vikram Singh', 'Neha Dhillon'];
-            const reviewsLogText = [
-                "Absolutely stellar stay options! Room 101 view vectors are gorgeous.",
-                "Authentic native slow cooked Lahauli dishes were deeply delicious.",
-                "Incredibly pristine spaces. Chhering bhaiya handles logistics smoothly.",
-                "Secure parking zones and robust running hot water networks function fully.",
-                "Smooth booking confirmation channels. Perfect mountain escape paths."
-            ];
+        // --- PDF GENERATION ---
+        function downloadPDF(firebaseKey) {
+            const b = window.bookings.find(x => x.firebaseKey === firebaseKey);
+            if(!b) return;
 
-            let cumulativeHTML = '';
-            for(let i=0; i<20; i++) {
-                let name = travelers[i % travelers.length];
-                let loc = locations[i % locations.length];
-                let text = reviewsLogText[i % reviewsLogText.length];
-                cumulativeHTML += `
-                <div class="inline-block bg-white border border-luxuryGold/10 p-5 rounded-2xl shadow-xs min-w-[280px] sm:min-w-[310px] whitespace-normal">
-                    <div class="flex items-center gap-2 mb-2">
-                        <div class="w-8 h-8 rounded-full bg-luxuryGold/20 flex items-center justify-center text-xs font-bold text-luxuryDarkGold uppercase">${name[0]}</div>
-                        <div>
-                            <h5 class="text-xs font-bold text-luxuryText">${name}</h5>
-                            <p class="text-[9px] text-gray-400 font-medium"><i class="fa-solid fa-location-dot"></i> Traveler from ${loc}</p>
-                        </div>
-                    </div>
-                    <div class="flex text-amber-500 text-[10px] mb-1"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    <p class="text-xs text-gray-600 italic">"${text}"</p>
-                </div>`;
-            }
-            targetTrack.innerHTML = cumulativeHTML;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setTextColor(44, 44, 44);
+            
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("The Pahadi Ghar - Darcha | Homestay", 105, 20, null, null, "center");
+            
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("Contact: +91 9418776308, +91 7876631873 | Email: pahadighar.darcha@gmail.com", 105, 27, null, null, "center");
+            
+            doc.setLineWidth(0.5);
+            doc.setDrawColor(197, 168, 128); // Luxury gold line
+            doc.line(15, 32, 195, 32);
 
-            let translationIndexOffset = 0;
-            setInterval(() => {
-                translationIndexOffset++;
-                if (translationIndexOffset >= 15) translationIndexOffset = 0;
-                targetTrack.style.transform = `translateX(${translationIndexOffset * -150}px)`;
-            }, 1500);
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text("Booking Confirmation Receipt", 105, 42, null, null, "center");
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            
+            let startY = 55;
+            const leftCol = 20;
+            const rightCol = 110;
+            const lineSpace = 10;
+
+            doc.text(`Guest Name: ${b.name}`, leftCol, startY);
+            doc.text(`Phone No: ${b.phone}`, rightCol, startY);
+            startY += lineSpace;
+
+            doc.text(`Check-in Date: ${b.cin}`, leftCol, startY);
+            doc.text(`Check-out Date: ${b.cout}`, rightCol, startY);
+            startY += lineSpace;
+
+            doc.text(`Total Duration: ${b.duration} Days`, leftCol, startY);
+            doc.text(`Rooms Booked: ${b.rooms ? b.rooms.join(', ') : ''}`, rightCol, startY);
+            startY += lineSpace;
+
+            doc.text(`Meal Plan: ${b.meal}`, leftCol, startY);
+            startY += 15;
+
+            // Payment Box
+            doc.setDrawColor(230, 226, 221);
+            doc.setFillColor(249, 248, 246);
+            doc.rect(15, startY, 180, 45, 'FD');
+            
+            startY += 10;
+            doc.setFont("helvetica", "bold");
+            doc.text("Payment Summary", 20, startY);
+            doc.setFont("helvetica", "normal");
+            
+            startY += 10;
+            doc.text(`Total Amount: INR ${b.total}/-`, 20, startY);
+            startY += 10;
+            doc.text(`Advance Paid: INR ${b.advance}/-`, 20, startY);
+            startY += 10;
+            doc.setFont("helvetica", "bold");
+            doc.text(`Balance Pending: INR ${b.balance}/-`, 20, startY);
+
+            // Footer
+            const footerY = 270;
+            doc.setDrawColor(197, 168, 128);
+            doc.line(15, footerY - 5, 195, footerY - 5);
+            
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
+            doc.text("Safe Travels! We look forward to hosting you.", 105, footerY, null, null, "center");
+            doc.text("Instructions: Valid ID required at check-in. Please do not litter in the mountains.", 105, footerY + 7, null, null, "center");
+
+            doc.save(`Booking_${b.name.replace(/\s+/g, '_')}_PahadiGhar.pdf`);
         }
 
-        window.addEventListener('firebase-ready', () => {
-            loadStorageState();
-        });
+        function downloadGuestPDF(firebaseKey) {
+            const g = window.guests.find(x => x.firebaseKey === firebaseKey);
+            if(!g) return;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            seedReviewsSliderMatrixEngine();
-            document.getElementById('liveCheckDate').value = "2026-07-25";
-            setTimeout(() => { loadStorageState(); }, 500);
-        });
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setTextColor(44, 44, 44);
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("The Pahadi Ghar - Darcha | Homestay", 105, 20, null, null, "center");
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("Contact: +91 9418776308, +91 7876631873 | Email: pahadighar.darcha@gmail.com", 105, 27, null, null, "center");
+            
+            doc.setLineWidth(0.5);
+            doc.setDrawColor(197, 168, 128);
+            doc.line(15, 32, 195, 32);
+
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text("Guest Registration Record", 105, 42, null, null, "center");
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            
+            let startY = 55;
+            const leftCol = 20;
+            const rightCol = 110;
+            const lineSpace.10 = 10;
+
+            doc.text(`Guest Name: ${g.name}`, leftCol, startY);
+            doc.text(`Phone No: ${g.phone}`, rightCol, startY);
+            startY += 10;
+
+            doc.text(`ID Number: ${g.idNum}`, leftCol, startY);
+            doc.text(`Vehicle No: ${g.vehicle}`, rightCol, startY);
+            startY += 10;
+
+            doc.text(`Coming From: ${g.coming}`, leftCol, startY);
+            doc.text(`Going To: ${g.going}`, rightCol, startY);
+            startY += 10;
+
+            doc.text(`Check-in: ${g.cin}`, leftCol, startY);
+            doc.text(`Check-out: ${g.cout}`, rightCol, startY);
+            startY += 10;
+
+            doc.text(`Rooms: ${g.rooms ? g.rooms.join(', ') : ''}`, leftCol, startY);
+            doc.text(`Total Guests: ${g.male}M / ${g.female}F / ${g.child}C`, rightCol, startY);
+            startY += 10;
+
+            doc.text(`Address: ${g.address}`, leftCol, startY);
+            
+            startY += 15;
+            doc.setFont("helvetica", "bold");
+            doc.text("Remarks / Notes:", leftCol, startY);
+            doc.setFont("helvetica", "normal");
+            startY += 7;
+            doc.text(g.remarks || "No specific remarks.", leftCol, startY, {maxWidth: 170});
+
+            const footerY = 270;
+            doc.setDrawColor(197, 168, 128);
+            doc.line(15, footerY - 5, 195, footerY - 5);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
+            doc.text("Record generated from Admin Portal", 105, footerY, null, null, "center");
+
+            doc.save(`Guest_${g.name.replace(/\s+/g, '_')}_Record.pdf`);
+        }
     </script>
 </body>
 </html>
