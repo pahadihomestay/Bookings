@@ -572,7 +572,6 @@
         // Global Data Arrays synced with Firebase
         window.bookings = [];
         window.guests = [];
-        const roomsList = ["101", "102", "103", "104", "105", "106", "107"];
 
         // Realtime Listeners for Bookings and Guests
         onValue(ref(db, 'pahadi_bookings'), (snapshot) => {
@@ -974,7 +973,7 @@
             doc.text("Contact: +91 9418776308, +91 7876631873 | Email: pahadighar.darcha@gmail.com", 105, 27, null, null, "center");
             
             doc.setLineWidth(0.5);
-            doc.setDrawColor(197, 168, 128); // Luxury gold line
+            doc.setDrawColor(197, 168, 128);
             doc.line(15, 32, 195, 32);
 
             doc.setFontSize(16);
@@ -1004,7 +1003,6 @@
             doc.text(`Meal Plan: ${b.meal}`, leftCol, startY);
             startY += 15;
 
-            // Payment Box
             doc.setDrawColor(230, 226, 221);
             doc.setFillColor(249, 248, 246);
             doc.rect(15, startY, 180, 45, 'FD');
@@ -1022,7 +1020,6 @@
             doc.setFont("helvetica", "bold");
             doc.text(`Balance Pending: INR ${b.balance}/-`, 20, startY);
 
-            // Footer
             const footerY = 270;
             doc.setDrawColor(197, 168, 128);
             doc.line(15, footerY - 5, 195, footerY - 5);
@@ -1064,7 +1061,6 @@
             let startY = 55;
             const leftCol = 20;
             const rightCol = 110;
-            const lineSpace.10 = 10;
 
             doc.text(`Guest Name: ${g.name}`, leftCol, startY);
             doc.text(`Phone No: ${g.phone}`, rightCol, startY);
