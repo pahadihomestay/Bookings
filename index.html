@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Pahadi Ghar - Admin Portal</title>
     <!-- Google Fonts for Premium Look -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -10,37 +10,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Luxury Light Theme Colors & Reset */
         :root {
-            --primary: #C5A880; /* Premium Muted Gold/Sand */
+            --primary: #C5A880;
             --primary-hover: #B0926A;
-            --secondary: #6B705C; /* Elegant Sage/Olive Grey */
-            --bg-color: #F9F8F6; /* Warm Ivory */
+            --secondary: #6B705C;
+            --bg-color: #F4F3F0;
             --card-bg: #FFFFFF;
-            --text-main: #2C2C2C; /* Soft Black */
+            --text-main: #2C2C2C;
             --text-muted: #757575;
-            --border-color: #E6E2DD;
-            --danger: #C87979; /* Muted Red */
+            --border-color: #E2DDD5;
+            --danger: #C87979;
             --booked-bg: #FDF3F3;
             --booked-text: #B46464;
             --free-bg: #F4F7F4;
             --free-text: #6B806B;
+            --shadow: 0 10px 30px rgba(0,0,0,0.04);
+            --radius: 12px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
         }
 
         h1, h2, h3 {
-            font-family: 'Cinzel', serif; /* Luxury Serif for headings */
+            font-family: 'Cinzel', serif;
         }
 
         /* Login Screen */
@@ -50,28 +53,29 @@
             align-items: center;
             height: 100vh;
             background: linear-gradient(135deg, #F9F8F6 0%, #EFEBE4 100%);
+            padding: 20px;
         }
 
         .login-box {
             background: var(--card-bg);
-            padding: 50px 40px;
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+            padding: 40px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             text-align: center;
-            width: 90%;
-            max-width: 420px;
+            width: 100%;
+            max-width: 400px;
             border: 1px solid var(--border-color);
         }
 
         .login-box h2 {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: var(--primary-hover);
-            font-size: 28px;
-            letter-spacing: 1px;
+            font-size: 26px;
+            letter-spacing: 0.5px;
         }
 
         .input-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             text-align: left;
         }
 
@@ -85,19 +89,19 @@
 
         .input-group input, .input-group select, .input-group textarea {
             width: 100%;
-            padding: 12px;
+            padding: 12px 14px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             outline: none;
-            font-size: 14px;
-            background: #FCFBFA;
+            font-size: 16px; /* Prevents mobile auto-zoom */
+            background: #FAFAFA;
             font-family: 'Montserrat', sans-serif;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
-        .input-group input:focus, .input-group select:focus {
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.1);
+            box-shadow: 0 0 0 3px rgba(197, 168, 128, 0.15);
             background: #fff;
         }
 
@@ -111,14 +115,12 @@
             font-size: 15px;
             font-weight: 500;
             width: 100%;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             font-family: 'Montserrat', sans-serif;
-            letter-spacing: 0.5px;
         }
 
         button:hover {
             background: var(--primary-hover);
-            box-shadow: 0 4px 12px rgba(176, 146, 106, 0.2);
         }
 
         /* Main Dashboard Layout */
@@ -128,11 +130,11 @@
 
         header {
             background: var(--card-bg);
-            padding: 18px 40px;
+            padding: 16px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -140,53 +142,65 @@
         }
 
         header h1 {
-            font-size: 24px;
+            font-size: 20px;
             color: var(--primary-hover);
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .logout-btn {
             background: var(--danger);
             width: auto;
-            padding: 10px 20px;
+            padding: 8px 16px;
             font-size: 13px;
         }
 
+        /* Clean Modern Tab Navigation */
         .nav-tabs {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin: 30px 20px;
-            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 800px;
+            margin: 25px auto 15px auto;
+            padding: 0 15px;
         }
 
         .nav-tabs button {
-            width: auto;
-            background: transparent;
+            flex: 1;
+            background: var(--card-bg);
             color: var(--text-muted);
-            border: 2px solid var(--border-color);
-            padding: 12px 25px;
+            border: 1px solid var(--border-color);
+            padding: 14px 15px;
             font-weight: 600;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .nav-tabs button:hover {
+            border-color: var(--primary);
+            color: var(--primary-hover);
         }
 
         .nav-tabs button.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(197, 168, 128, 0.25);
         }
 
         .container {
-            max-width: 1300px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px 60px 20px;
+            padding: 10px 20px 50px 20px;
         }
 
         .section {
             display: none;
             background: var(--card-bg);
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
         }
@@ -196,18 +210,18 @@
         }
 
         .section-title {
-            margin-bottom: 25px;
-            padding-bottom: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
             border-bottom: 1px solid var(--border-color);
             color: var(--secondary);
-            font-size: 22px;
+            font-size: 18px;
         }
 
         /* Form Grid System */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
         }
 
         .full-width {
@@ -217,34 +231,35 @@
         .checkbox-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 8px;
+            gap: 10px;
+            margin-top: 6px;
         }
 
         .checkbox-group label {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--bg-color);
-            padding: 10px 16px;
+            background: #FAFAFA;
+            padding: 10px 14px;
             border-radius: 8px;
             cursor: pointer;
             border: 1px solid var(--border-color);
             font-size: 14px;
+            font-weight: 500;
             transition: all 0.2s;
         }
         
         .checkbox-group label:hover {
             border-color: var(--primary);
+            background: #fff;
         }
 
         /* Tables */
         .table-responsive {
             overflow-x: auto;
-            margin-top: 20px;
-            border-radius: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
 
         table {
@@ -254,30 +269,30 @@
         }
 
         th, td {
-            padding: 16px 20px;
+            padding: 14px 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         th {
-            background: var(--bg-color);
+            background: #F8F7F5;
             color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.5px;
         }
 
         tr:hover {
-            background: #FCFBFA;
+            background: #FAFAFA;
         }
 
         .action-btn {
-            padding: 8px 14px;
-            font-size: 12px;
+            padding: 6px 12px;
+            font-size: 11px;
             width: auto;
-            margin-right: 8px;
+            margin-right: 6px;
             border-radius: 6px;
         }
         .btn-pdf { background: var(--secondary); }
@@ -286,61 +301,64 @@
         /* Calendar Matrix */
         .calendar-controls {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 20px;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .calendar-matrix {
             display: grid;
-            grid-template-columns: 120px repeat(14, minmax(100px, 1fr));
+            grid-template-columns: 110px repeat(14, minmax(90px, 1fr));
             gap: 1px;
             background: var(--border-color);
             border: 1px solid var(--border-color);
             overflow-x: auto;
-            border-radius: 12px;
+            border-radius: 8px;
         }
 
         .cal-header, .cal-cell, .cal-room {
             background: var(--card-bg);
-            padding: 15px 10px;
+            padding: 12px 8px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
         }
 
-        .cal-header { font-weight: 600; background: var(--bg-color); color: var(--text-muted); }
-        .cal-room { font-weight: 600; background: var(--bg-color); text-align: left; color: var(--secondary); }
+        .cal-header { font-weight: 600; background: #F8F7F5; color: var(--text-muted); }
+        .cal-room { font-weight: 600; background: #F8F7F5; text-align: left; color: var(--secondary); }
         
         .status-free { background: var(--free-bg); color: var(--free-text); }
-        .status-booked { background: var(--booked-bg); color: var(--booked-text); font-weight: 500; cursor: pointer;}
+        .status-booked { background: var(--booked-bg); color: var(--booked-text); font-weight: 500; }
 
         /* Modals */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 20px;
         }
         .modal-content {
             background: var(--card-bg);
-            padding: 35px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
+            padding: 30px;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 450px;
             text-align: left;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             border: 1px solid var(--border-color);
         }
-        .modal-content h3 { margin-bottom: 20px; color: var(--danger); font-family: 'Montserrat', sans-serif; font-weight: 600; }
-        .modal-actions { display: flex; gap: 15px; margin-top: 25px; }
+        .modal-content h3 { margin-bottom: 15px; color: var(--danger); font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 600; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
 
         @media (max-width: 768px) {
-            header { flex-direction: column; gap: 15px; text-align: center; padding: 20px; }
-            .nav-tabs { flex-direction: column; }
+            header { padding: 14px 20px; }
+            .nav-tabs { flex-direction: column; gap: 8px; margin: 15px; }
+            .section { padding: 20px 15px; }
         }
     </style>
 </head>
@@ -350,7 +368,7 @@
     <div id="login-screen">
         <div class="login-box">
             <h2>The Pahadi Ghar</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 14px;">Admin Portal Login</p>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 13px;">Admin Portal Login</p>
             <div class="input-group">
                 <label>Username</label>
                 <input type="text" id="username" placeholder="Enter username">
@@ -359,7 +377,7 @@
                 <label>Password</label>
                 <input type="password" id="password" placeholder="Enter password">
             </div>
-            <p id="login-error" style="color: var(--danger); font-size: 13px; margin-bottom: 15px; display: none;">Invalid credentials!</p>
+            <p id="login-error" style="color: var(--danger); font-size: 12px; margin-bottom: 12px; display: none;">Invalid credentials!</p>
             <button onclick="login()">Access Portal</button>
         </div>
     </div>
@@ -383,13 +401,13 @@
             <div id="booking-tab" class="section active">
                 <h2 class="section-title">New Booking Entry</h2>
                 <div class="form-grid">
-                    <div class="input-group"><label>Guest Name</label><input type="text" id="b-name"></div>
-                    <div class="input-group"><label>Phone Number</label><input type="number" id="b-phone"></div>
+                    <div class="input-group"><label>Guest Name</label><input type="text" id="b-name" placeholder="Full Name"></div>
+                    <div class="input-group"><label>Phone Number</label><input type="tel" id="b-phone" placeholder="Mobile Number"></div>
                     <div class="input-group"><label>Check-in Date</label><input type="date" id="b-cin" onchange="calcDurationB()"></div>
                     <div class="input-group"><label>Check-out Date</label><input type="date" id="b-cout" onchange="calcDurationB()"></div>
-                    <div class="input-group"><label>Total Duration (Days)</label><input type="number" id="b-duration" readonly style="background:var(--bg-color);"></div>
-                    <div class="input-group"><label>Adults</label><input type="number" id="b-adults" value="1"></div>
-                    <div class="input-group"><label>Children</label><input type="number" id="b-children" value="0"></div>
+                    <div class="input-group"><label>Total Duration (Days)</label><input type="number" id="b-duration" readonly style="background:#F4F3F0;"></div>
+                    <div class="input-group"><label>Adults</label><input type="number" id="b-adults" placeholder="No. of adults"></div>
+                    <div class="input-group"><label>Children</label><input type="number" id="b-children" placeholder="No. of children"></div>
                     
                     <div class="input-group full-width">
                         <label>Select Rooms</label>
@@ -404,7 +422,7 @@
                         </div>
                     </div>
                     
-                    <div class="input-group"><label>Total Rooms Booked</label><input type="number" id="b-room-count" readonly style="background:var(--bg-color);"></div>
+                    <div class="input-group"><label>Total Rooms Booked</label><input type="number" id="b-room-count" readonly style="background:#F4F3F0;"></div>
                     <div class="input-group">
                         <label>Meal Plan</label>
                         <select id="b-meal">
@@ -414,17 +432,17 @@
                             <option value="Only Breakfast">Only Breakfast Include</option>
                         </select>
                     </div>
-                    <div class="input-group"><label>Total Payment (₹)</label><input type="number" id="b-total" oninput="calcPayment()"></div>
-                    <div class="input-group"><label>Advance Paid (₹)</label><input type="number" id="b-advance" oninput="calcPayment()"></div>
-                    <div class="input-group"><label>Balance Pending (₹)</label><input type="number" id="b-balance" readonly style="background:var(--bg-color); color: var(--danger); font-weight: bold;"></div>
+                    <div class="input-group"><label>Total Payment (₹)</label><input type="number" id="b-total" placeholder="Total amount" oninput="calcPayment()"></div>
+                    <div class="input-group"><label>Advance Paid (₹)</label><input type="number" id="b-advance" placeholder="Advance amount" oninput="calcPayment()"></div>
+                    <div class="input-group"><label>Balance Pending (₹)</label><input type="number" id="b-balance" readonly style="background:#F4F3F0; color: var(--danger); font-weight: bold;"></div>
                     
-                    <div class="input-group full-width">
+                    <div class="input-group full-width" style="margin-top: 10px;">
                         <button onclick="submitBooking()">Submit Booking</button>
                     </div>
                 </div>
 
-                <h2 class="section-title" style="margin-top: 50px;">Booking History</h2>
-                <div class="input-group" style="max-width: 320px;">
+                <h2 class="section-title" style="margin-top: 40px;">Booking History</h2>
+                <div class="input-group" style="max-width: 280px;">
                     <label>Search by Date (Find nearest bookings)</label>
                     <input type="date" id="b-search-date" onchange="renderBookings()">
                 </div>
@@ -437,13 +455,15 @@
                                 <th>Name</th>
                                 <th>Phone</th>
                                 <th>Rooms</th>
+                                <th>Adults / Child</th>
                                 <th>Meal Plan</th>
                                 <th>Total (₹)</th>
+                                <th>Advance (₹)</th>
                                 <th>Balance (₹)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody><!-- Populated via Firebase Realtime --></tbody>
+                        <tbody><!-- Populated via Firebase --></tbody>
                     </table>
                 </div>
             </div>
@@ -452,17 +472,17 @@
             <div id="guest-tab" class="section">
                 <h2 class="section-title">In-House Guest Entry</h2>
                 <div class="form-grid">
-                    <div class="input-group"><label>Guest Name</label><input type="text" id="g-name"></div>
-                    <div class="input-group"><label>Phone Number</label><input type="number" id="g-phone"></div>
-                    <div class="input-group"><label>Address</label><input type="text" id="g-address"></div>
-                    <div class="input-group"><label>ID Number (Aadhar/Passport)</label><input type="text" id="g-id"></div>
-                    <div class="input-group"><label>Vehicle Number</label><input type="text" id="g-vehicle"></div>
-                    <div class="input-group"><label>Coming From</label><input type="text" id="g-coming"></div>
-                    <div class="input-group"><label>Going To</label><input type="text" id="g-going"></div>
+                    <div class="input-group"><label>Guest Name</label><input type="text" id="g-name" placeholder="Full Name"></div>
+                    <div class="input-group"><label>Phone Number</label><input type="tel" id="g-phone" placeholder="Mobile Number"></div>
+                    <div class="input-group"><label>Address</label><input type="text" id="g-address" placeholder="Residential Address"></div>
+                    <div class="input-group"><label>ID Number (Aadhar/Passport)</label><input type="text" id="g-id" placeholder="ID Number"></div>
+                    <div class="input-group"><label>Vehicle Number</label><input type="text" id="g-vehicle" placeholder="Vehicle No."></div>
+                    <div class="input-group"><label>Coming From</label><input type="text" id="g-coming" placeholder="Origin city"></div>
+                    <div class="input-group"><label>Going To</label><input type="text" id="g-going" placeholder="Destination"></div>
                     
                     <div class="input-group"><label>Check-in Date</label><input type="date" id="g-cin" onchange="calcDurationG()"></div>
                     <div class="input-group"><label>Check-out Date</label><input type="date" id="g-cout" onchange="calcDurationG()"></div>
-                    <div class="input-group"><label>Duration (Days)</label><input type="number" id="g-duration" readonly style="background:var(--bg-color);"></div>
+                    <div class="input-group"><label>Duration (Days)</label><input type="number" id="g-duration" readonly style="background:#F4F3F0;"></div>
                     
                     <div class="input-group full-width">
                         <label>Allocated Rooms</label>
@@ -476,20 +496,20 @@
                             <label><input type="checkbox" value="107" onchange="countRoomsG()"> 107</label>
                         </div>
                     </div>
-                    <div class="input-group"><label>Total Rooms</label><input type="number" id="g-room-count" readonly style="background:var(--bg-color);"></div>
+                    <div class="input-group"><label>Total Rooms</label><input type="number" id="g-room-count" readonly style="background:#F4F3F0;"></div>
                     
-                    <div class="input-group"><label>Male Guests</label><input type="number" id="g-male" value="0"></div>
-                    <div class="input-group"><label>Female Guests</label><input type="number" id="g-female" value="0"></div>
-                    <div class="input-group"><label>Children</label><input type="number" id="g-child" value="0"></div>
+                    <div class="input-group"><label>Male Guests</label><input type="number" id="g-male" placeholder="0"></div>
+                    <div class="input-group"><label>Female Guests</label><input type="number" id="g-female" placeholder="0"></div>
+                    <div class="input-group"><label>Children</label><input type="number" id="g-child" placeholder="0"></div>
                     
-                    <div class="input-group full-width"><label>Remarks / Notes</label><textarea id="g-remarks" rows="3" placeholder="Any extra information..."></textarea></div>
+                    <div class="input-group full-width"><label>Remarks / Notes</label><textarea id="g-remarks" rows="2" placeholder="Any extra information..."></textarea></div>
 
-                    <div class="input-group full-width">
+                    <div class="input-group full-width" style="margin-top: 10px;">
                         <button onclick="submitGuest()">Submit Guest Entry</button>
                     </div>
                 </div>
 
-                <h2 class="section-title" style="margin-top: 50px;">Guest History</h2>
+                <h2 class="section-title" style="margin-top: 40px;">Guest History</h2>
                 <div class="table-responsive">
                     <table id="guest-table">
                         <thead>
@@ -504,7 +524,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody><!-- Populated via Firebase Realtime --></tbody>
+                        <tbody><!-- Populated via Firebase --></tbody>
                     </table>
                 </div>
             </div>
@@ -513,8 +533,8 @@
             <div id="calendar-tab" class="section">
                 <h2 class="section-title">Room Availability Calendar</h2>
                 <div class="calendar-controls">
-                    <label style="font-weight: 500; font-size: 14px;">Start Date:</label>
-                    <input type="date" id="cal-start-date" onchange="renderCalendar()" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Montserrat';">
+                    <label style="font-weight: 500; font-size: 13px;">Start Date:</label>
+                    <input type="date" id="cal-start-date" onchange="renderCalendar()" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Montserrat'; width: auto;">
                     <button style="width:auto; padding: 10px 20px;" onclick="renderCalendar()">Refresh Calendar</button>
                 </div>
                 <div class="table-responsive">
@@ -531,7 +551,7 @@
     <div id="clash-modal" class="modal">
         <div class="modal-content">
             <h3>Room Clash Detected!</h3>
-            <p id="clash-message" style="margin-bottom:20px; line-height: 1.6;"></p>
+            <p id="clash-message" style="margin-bottom:15px; line-height: 1.5; font-size: 13px;"></p>
             <div class="modal-actions">
                 <button onclick="closeModal('clash-modal')" style="background:var(--secondary);">Close & Adjust Dates</button>
             </div>
@@ -542,7 +562,7 @@
     <div id="delete-modal" class="modal">
         <div class="modal-content">
             <h3 style="color: var(--danger);">Confirm Deletion</h3>
-            <p style="margin-bottom:20px; line-height: 1.6;">Are you sure you want to permanently delete this entry? This action cannot be undone.</p>
+            <p style="margin-bottom:15px; line-height: 1.5; font-size: 13px;">Are you sure you want to permanently delete this entry? This action cannot be undone.</p>
             <div class="modal-actions">
                 <button id="confirm-delete-btn" style="background:var(--danger);">Yes, Delete</button>
                 <button onclick="closeModal('delete-modal')" style="background:var(--text-muted);">Cancel</button>
@@ -565,15 +585,12 @@
             measurementId: "G-LEP2RD7LTG"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Global Data Arrays synced with Firebase
         window.bookings = [];
         window.guests = [];
 
-        // Realtime Listeners for Bookings and Guests
         onValue(ref(db, 'pahadi_bookings'), (snapshot) => {
             const data = snapshot.val();
             window.bookings = [];
@@ -597,7 +614,6 @@
             if(typeof renderGuests === 'function') renderGuests();
         });
 
-        // Expose Firebase DB actions globally to interact with HTML inline handlers
         window.fbSaveBooking = (bookingData) => {
             const newRef = push(ref(db, 'pahadi_bookings'));
             return set(newRef, bookingData);
@@ -619,7 +635,6 @@
 
     <!-- Main Logic Script -->
     <script>
-        // Initialization
         window.onload = () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('b-cin').value = today;
@@ -627,7 +642,6 @@
             document.getElementById('cal-start-date').value = today;
         };
 
-        // --- AUTHENTICATION ---
         function login() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
@@ -648,7 +662,6 @@
             document.getElementById('login-error').style.display = 'none';
         }
 
-        // --- UI TABS ---
         function switchTab(tabId) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
@@ -666,7 +679,6 @@
             document.getElementById(id).style.display = 'none';
         }
 
-        // --- HELPERS ---
         function getSelectedCheckboxes(containerId) {
             const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
             let values = [];
@@ -699,9 +711,8 @@
             document.getElementById('b-balance').value = total - advance;
         }
 
-        // --- DELETE CONFIRMATION LOGIC ---
         let deleteTargetKey = null;
-        let deleteTargetType = null; // 'booking' or 'guest'
+        let deleteTargetType = null;
 
         function requestDelete(firebaseKey, type) {
             deleteTargetKey = firebaseKey;
@@ -711,17 +722,12 @@
 
         document.getElementById('confirm-delete-btn').addEventListener('click', function() {
             if(deleteTargetType === 'booking') {
-                window.fbDeleteBooking(deleteTargetKey).then(() => {
-                    closeModal('delete-modal');
-                });
+                window.fbDeleteBooking(deleteTargetKey).then(() => { closeModal('delete-modal'); });
             } else if (deleteTargetType === 'guest') {
-                window.fbDeleteGuest(deleteTargetKey).then(() => {
-                    closeModal('delete-modal');
-                });
+                window.fbDeleteGuest(deleteTargetKey).then(() => { closeModal('delete-modal'); });
             }
         });
 
-        // --- BOOKING LOGIC ---
         function checkClash(cin, cout, selectedRooms, excludeKey = null) {
             const newStart = new Date(cin);
             const newEnd = new Date(cout);
@@ -748,11 +754,13 @@
             const cin = document.getElementById('b-cin').value;
             const cout = document.getElementById('b-cout').value;
             const duration = document.getElementById('b-duration').value;
+            const adults = document.getElementById('b-adults').value || '0';
+            const children = document.getElementById('b-children').value || '0';
             const rooms = getSelectedCheckboxes('b-rooms-container');
             const meal = document.getElementById('b-meal').value;
-            const total = document.getElementById('b-total').value;
-            const advance = document.getElementById('b-advance').value;
-            const balance = document.getElementById('b-balance').value;
+            const total = document.getElementById('b-total').value || '0';
+            const advance = document.getElementById('b-advance').value || '0';
+            const balance = document.getElementById('b-balance').value || '0';
 
             if(!name || !cin || !cout || rooms.length === 0) {
                 alert("Please fill name, dates, and select at least one room.");
@@ -778,13 +786,15 @@
             }
 
             const booking = {
-                id: Date.now(), name, phone, cin, cout, duration, rooms, meal, total, advance, balance,
+                id: Date.now(), name, phone, cin, cout, duration, adults, children, rooms, meal, total, advance, balance,
                 timestamp: new Date().toISOString()
             };
 
             window.fbSaveBooking(booking).then(() => {
                 document.getElementById('b-name').value = '';
                 document.getElementById('b-phone').value = '';
+                document.getElementById('b-adults').value = '';
+                document.getElementById('b-children').value = '';
                 clearCheckboxes('b-rooms-container');
                 countRoomsB();
                 document.getElementById('b-total').value = '';
@@ -818,8 +828,10 @@
                     <td><strong>${b.name}</strong></td>
                     <td>${b.phone}</td>
                     <td>${b.rooms ? b.rooms.join(', ') : ''}</td>
+                    <td>${b.adults || 0} A / ${b.children || 0} C</td>
                     <td>${b.meal}</td>
                     <td>₹${b.total}</td>
+                    <td>₹${b.advance || 0}</td>
                     <td style="color:var(--danger); font-weight:600;">₹${b.balance}</td>
                     <td>
                         <button class="action-btn btn-pdf" onclick="downloadPDF('${b.firebaseKey}')">PDF</button>
@@ -830,7 +842,6 @@
             });
         }
 
-        // --- GUEST LOGIC ---
         function submitGuest() {
             const name = document.getElementById('g-name').value;
             if(!name) { alert("Guest name is required"); return; }
@@ -849,9 +860,9 @@
                 cout: document.getElementById('g-cout').value,
                 duration: document.getElementById('g-duration').value,
                 rooms: getSelectedCheckboxes('g-rooms-container'),
-                male: document.getElementById('g-male').value,
-                female: document.getElementById('g-female').value,
-                child: document.getElementById('g-child').value,
+                male: document.getElementById('g-male').value || '0',
+                female: document.getElementById('g-female').value || '0',
+                child: document.getElementById('g-child').value || '0',
                 remarks: document.getElementById('g-remarks').value
             };
 
@@ -863,6 +874,9 @@
                 document.getElementById('g-vehicle').value = '';
                 document.getElementById('g-coming').value = '';
                 document.getElementById('g-going').value = '';
+                document.getElementById('g-male').value = '';
+                document.getElementById('g-female').value = '';
+                document.getElementById('g-child').value = '';
                 document.getElementById('g-remarks').value = '';
                 clearCheckboxes('g-rooms-container');
                 countRoomsG();
@@ -897,7 +911,6 @@
             });
         }
 
-        // --- CALENDAR LOGIC ---
         function renderCalendar() {
             const matrix = document.getElementById('calendar-matrix');
             if(!matrix) return;
@@ -909,9 +922,9 @@
             const start = new Date(startDateStr);
             const daysToDisplay = 14;
 
-            matrix.style.gridTemplateColumns = `120px repeat(${daysToDisplay}, minmax(100px, 1fr))`;
+            matrix.style.gridTemplateColumns = `110px repeat(${daysToDisplay}, minmax(90px, 1fr))`;
             
-            let headerHtml = `<div class="cal-header" style="background:var(--bg-color);">Room \\ Date</div>`;
+            let headerHtml = `<div class="cal-header">Room \\ Date</div>`;
             let dates = [];
             
             for(let i=0; i<daysToDisplay; i++) {
@@ -954,7 +967,6 @@
             });
         }
 
-        // --- PDF GENERATION ---
         function downloadPDF(firebaseKey) {
             const b = window.bookings.find(x => x.firebaseKey === firebaseKey);
             if(!b) return;
@@ -963,30 +975,29 @@
             const doc = new jsPDF();
             
             doc.setTextColor(44, 44, 44);
-            
-            doc.setFontSize(22);
+            doc.setFontSize(20);
             doc.setFont("helvetica", "bold");
             doc.text("The Pahadi Ghar - Darcha | Homestay", 105, 20, null, null, "center");
             
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont("helvetica", "normal");
-            doc.text("Contact: +91 9418776308, +91 7876631873 | Email: pahadighar.darcha@gmail.com", 105, 27, null, null, "center");
+            doc.text("Contact: +91 9418776308, +91 7876631873 | Email: pahadighar.darcha@gmail.com", 105, 26, null, null, "center");
             
             doc.setLineWidth(0.5);
             doc.setDrawColor(197, 168, 128);
-            doc.line(15, 32, 195, 32);
+            doc.line(15, 30, 195, 30);
 
-            doc.setFontSize(16);
+            doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
-            doc.text("Booking Confirmation Receipt", 105, 42, null, null, "center");
+            doc.text("Booking Confirmation Receipt", 105, 40, null, null, "center");
 
-            doc.setFontSize(12);
+            doc.setFontSize(11);
             doc.setFont("helvetica", "normal");
             
-            let startY = 55;
+            let startY = 52;
             const leftCol = 20;
             const rightCol = 110;
-            const lineSpace = 10;
+            const lineSpace = 9;
 
             doc.text(`Guest Name: ${b.name}`, leftCol, startY);
             doc.text(`Phone No: ${b.phone}`, rightCol, startY);
@@ -1000,23 +1011,24 @@
             doc.text(`Rooms Booked: ${b.rooms ? b.rooms.join(', ') : ''}`, rightCol, startY);
             startY += lineSpace;
 
-            doc.text(`Meal Plan: ${b.meal}`, leftCol, startY);
+            doc.text(`Adults: ${b.adults || 0} | Children: ${b.children || 0}`, leftCol, startY);
+            doc.text(`Meal Plan: ${b.meal}`, rightCol, startY);
             startY += 15;
 
-            doc.setDrawColor(230, 226, 221);
-            doc.setFillColor(249, 248, 246);
-            doc.rect(15, startY, 180, 45, 'FD');
+            doc.setDrawColor(226, 221, 213);
+            doc.setFillColor(244, 243, 240);
+            doc.rect(15, startY, 180, 42, 'FD');
             
-            startY += 10;
+            startY += 9;
             doc.setFont("helvetica", "bold");
             doc.text("Payment Summary", 20, startY);
             doc.setFont("helvetica", "normal");
             
-            startY += 10;
+            startY += 9;
             doc.text(`Total Amount: INR ${b.total}/-`, 20, startY);
-            startY += 10;
-            doc.text(`Advance Paid: INR ${b.advance}/-`, 20, startY);
-            startY += 10;
+            startY += 9;
+            doc.text(`Advance Paid: INR ${b.advance || 0}/-`, 20, startY);
+            startY += 9;
             doc.setFont("helvetica", "bold");
             doc.text(`Balance Pending: INR ${b.balance}/-`, 20, startY);
 
@@ -1024,10 +1036,10 @@
             doc.setDrawColor(197, 168, 128);
             doc.line(15, footerY - 5, 195, footerY - 5);
             
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont("helvetica", "italic");
             doc.text("Safe Travels! We look forward to hosting you.", 105, footerY, null, null, "center");
-            doc.text("Instructions: Valid ID required at check-in. Please do not litter in the mountains.", 105, footerY + 7, null, null, "center");
+            doc.text("Instructions: Valid ID required at check-in. Please do not litter in the mountains.", 105, footerY + 6, null, null, "center");
 
             doc.save(`Booking_${b.name.replace(/\s+/g, '_')}_PahadiGhar.pdf`);
         }
@@ -1040,61 +1052,61 @@
             const doc = new jsPDF();
             
             doc.setTextColor(44, 44, 44);
-            doc.setFontSize(22);
+            doc.setFontSize(20);
             doc.setFont("helvetica", "bold");
             doc.text("The Pahadi Ghar - Darcha | Homestay", 105, 20, null, null, "center");
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont("helvetica", "normal");
-            doc.text("Contact: +91 9418776308, +91 7876631873 | Email: pahadighar.darcha@gmail.com", 105, 27, null, null, "center");
+            doc.text("Contact: +91 9418776308, +91 7876631873 | Email: pahadighar.darcha@gmail.com", 105, 26, null, null, "center");
             
             doc.setLineWidth(0.5);
             doc.setDrawColor(197, 168, 128);
-            doc.line(15, 32, 195, 32);
+            doc.line(15, 30, 195, 30);
 
-            doc.setFontSize(16);
+            doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
-            doc.text("Guest Registration Record", 105, 42, null, null, "center");
+            doc.text("Guest Registration Record", 105, 40, null, null, "center");
 
-            doc.setFontSize(12);
+            doc.setFontSize(11);
             doc.setFont("helvetica", "normal");
             
-            let startY = 55;
+            let startY = 52;
             const leftCol = 20;
             const rightCol = 110;
 
             doc.text(`Guest Name: ${g.name}`, leftCol, startY);
             doc.text(`Phone No: ${g.phone}`, rightCol, startY);
-            startY += 10;
+            startY += 9;
 
             doc.text(`ID Number: ${g.idNum}`, leftCol, startY);
             doc.text(`Vehicle No: ${g.vehicle}`, rightCol, startY);
-            startY += 10;
+            startY += 9;
 
             doc.text(`Coming From: ${g.coming}`, leftCol, startY);
             doc.text(`Going To: ${g.going}`, rightCol, startY);
-            startY += 10;
+            startY += 9;
 
             doc.text(`Check-in: ${g.cin}`, leftCol, startY);
             doc.text(`Check-out: ${g.cout}`, rightCol, startY);
-            startY += 10;
+            startY += 9;
 
             doc.text(`Rooms: ${g.rooms ? g.rooms.join(', ') : ''}`, leftCol, startY);
             doc.text(`Total Guests: ${g.male}M / ${g.female}F / ${g.child}C`, rightCol, startY);
-            startY += 10;
+            startY += 9;
 
             doc.text(`Address: ${g.address}`, leftCol, startY);
             
-            startY += 15;
+            startY += 14;
             doc.setFont("helvetica", "bold");
             doc.text("Remarks / Notes:", leftCol, startY);
             doc.setFont("helvetica", "normal");
-            startY += 7;
+            startY += 6;
             doc.text(g.remarks || "No specific remarks.", leftCol, startY, {maxWidth: 170});
 
             const footerY = 270;
             doc.setDrawColor(197, 168, 128);
             doc.line(15, footerY - 5, 195, footerY - 5);
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont("helvetica", "italic");
             doc.text("Record generated from Admin Portal", 105, footerY, null, null, "center");
 
