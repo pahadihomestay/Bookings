@@ -463,9 +463,9 @@
                             <option value="Only Breakfast">Only Breakfast Include</option>
                         </select>
                     </div>
-                    <div class="input-group"><label>Total Payment (₹)</label><input type="number" id="b-total" placeholder="Total amount" oninput="calcPayment()"></div>
-                    <div class="input-group"><label>Advance Paid (₹)</label><input type="number" id="b-advance" placeholder="Advance amount" oninput="calcPayment()"></div>
-                    <div class="input-group"><label>Balance Pending (₹)</label><input type="number" id="b-balance" readonly style="background:#F4F3F0; color: var(--danger); font-weight: bold;"></div>
+                    <div class="input-group"><label>Total Payment (â¹)</label><input type="number" id="b-total" placeholder="Total amount" oninput="calcPayment()"></div>
+                    <div class="input-group"><label>Advance Paid (â¹)</label><input type="number" id="b-advance" placeholder="Advance amount" oninput="calcPayment()"></div>
+                    <div class="input-group"><label>Balance Pending (â¹)</label><input type="number" id="b-balance" readonly style="background:#F4F3F0; color: var(--danger); font-weight: bold;"></div>
                     
                     <div class="input-group full-width" style="margin-top: 10px;">
                         <button onclick="submitBooking()">Submit Booking</button>
@@ -488,9 +488,9 @@
                                 <th>Rooms</th>
                                 <th>Adults / Child</th>
                                 <th>Meal Plan</th>
-                                <th>Total (₹)</th>
-                                <th>Advance (₹)</th>
-                                <th>Balance (₹)</th>
+                                <th>Total (â¹)</th>
+                                <th>Advance (â¹)</th>
+                                <th>Balance (â¹)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -910,9 +910,9 @@
                     <td>${b.rooms ? b.rooms.join(', ') : ''}</td>
                     <td>${b.adults || 0} A / ${b.children || 0} C</td>
                     <td>${b.meal}</td>
-                    <td>₹${b.total}</td>
-                    <td>₹${b.advance || 0}</td>
-                    <td style="color:var(--danger); font-weight:600;">₹${b.balance}</td>
+                    <td>â¹${b.total}</td>
+                    <td>â¹${b.advance || 0}</td>
+                    <td style="color:var(--danger); font-weight:600;">â¹${b.balance}</td>
                     <td>
                         <button class="action-btn btn-pdf" onclick="downloadPDF('${b.firebaseKey}')">PDF</button>
                         <button class="action-btn btn-delete" onclick="requestDelete('${b.firebaseKey}', 'booking')">Delete</button>
