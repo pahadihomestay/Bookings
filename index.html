@@ -288,6 +288,37 @@
             background: #FAFAFA;
         }
 
+        /* Status Styling for Bookings Rows */
+        tr.old-booking {
+            background-color: #FDF2F2 !important;
+            color: #A94442;
+        }
+        tr.old-booking:hover {
+            background-color: #FAD6D6 !important;
+        }
+
+        /* Alert Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .badge-green {
+            background: #E1F5FE;
+            color: #0288D1;
+        }
+        .badge-urgent {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        .badge-old {
+            background: #FFCDD2;
+            color: #C62828;
+        }
+
         .action-btn {
             padding: 6px 12px;
             font-size: 11px;
@@ -811,7 +842,31 @@
             if(!tbody) return;
             tbody.innerHTML = '';
             let searchDate = document.getElementById('b-search-date').value;
-            let sorted = [...window.bookings].sort((a, b) => new Date(a.cin) - new Date(b.cin));
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Separate and sort bookings: Active/Future bookings vs Old bookings
+            let activeBookings = [];
+            let oldBookings = [];
+
+            window.bookings.forEach(b => {
+                const checkOutDate = new Date(b.cout);
+                checkOutDate.setHours(0, 0, 0, 0);
+
+                if (checkOutDate < today) {
+                    oldBookings.push(b); // Date has passed
+                } else {
+                    activeBookings.push(b); // Upcoming or currently active
+                }
+            });
+
+            // Sort active bookings by nearest check-in date (ascending)
+            activeBookings.sort((a, b) => new Date(a.cin) - new Date(b.cin));
+            // Sort old bookings by oldest check-in date first to push oldest to the very bottom
+            oldBookings.sort((a, b) => new Date(a.cin) - new Date(b.cin));
+
+            let sorted = [...activeBookings, ...oldBookings];
             
             if(searchDate) {
                 const sDate = new Date(searchDate);
@@ -822,10 +877,35 @@
 
             sorted.forEach(b => {
                 const tr = document.createElement('tr');
+                const checkInDate = new Date(b.cin);
+                checkInDate.setHours(0, 0, 0, 0);
+                const checkOutDate = new Date(b.cout);
+                checkOutDate.setHours(0, 0, 0, 0);
+
+                let badgeHtml = '';
+                
+                if (checkOutDate < today) {
+                    tr.classList.add('old-booking');
+                    badgeHtml = `<br><span class="badge badge-old">Old Booking</span>`;
+                } else {
+                    const diffTime = checkInDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays === 0) {
+                        badgeHtml = `<br><span class="badge badge-urgent">Arrive Today</span>`;
+                    } else if (diffDays === 1) {
+                        badgeHtml = `<br><span class="badge badge-green">Arrive Tomorrow</span>`;
+                    } else if (diffDays > 1 && diffDays <= 10) {
+                        badgeHtml = `<br><span class="badge badge-green">Arrive in ${diffDays} days</span>`;
+                    } else if (diffDays > 10) {
+                        badgeHtml = `<br><span class="badge badge-green">Arrive in ${diffDays} days</span>`;
+                    }
+                }
+
                 tr.innerHTML = `
                     <td>${b.cin}</td>
                     <td>${b.cout}</td>
-                    <td><strong>${b.name}</strong></td>
+                    <td><strong>${b.name}</strong>${badgeHtml}</td>
                     <td>${b.phone}</td>
                     <td>${b.rooms ? b.rooms.join(', ') : ''}</td>
                     <td>${b.adults || 0} A / ${b.children || 0} C</td>
